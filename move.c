@@ -100,6 +100,9 @@ int main(int argc, char** argv)
             {
                 x = 0;
                 y = 0;
+                color_red = 255;
+                color_green = 255;
+                color_blue  = 255;
             }
             if (event.keyboard.unichar == 't')
             {
