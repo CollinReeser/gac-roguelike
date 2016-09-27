@@ -1,8 +1,17 @@
 
-all: main move
+all: main move gac
 
 main: main.c
-	gcc main.c -o main -lallegro -lallegro_image
+	clang++ main.c -o main -lallegro -lallegro_image
 
 move: move.c
-	gcc move.c -o move -lallegro -lallegro_image
+	clang++ move.c -o move -lallegro -lallegro_image
+
+gac: gac.cpp context.cpp context.h
+	clang++ gac.cpp context.cpp -o gac -lallegro -lallegro_image
+
+realclean:
+	rm -f *.o
+	rm -f main
+	rm -f move
+	rm -f gac
