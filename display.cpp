@@ -53,6 +53,8 @@ void Display::init_tilemap()
     uint64_t tile_width = 8;
     uint64_t tile_height = 16;
 
+    // These rows match rows in the current tileset file, with any extraneous
+    // spaces being placeholders for special characters.
     std::vector<std::string> char_rows = {
         " !\"#$%&'()*+,-./0123456789:;<=>?",
         "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_",
@@ -82,6 +84,8 @@ void Display::draw_dungeon(
 ) {
     al_clear_to_color(al_map_rgb_f(0, 0, 0));
 
+    // Defer actually "rendering" any drawing we do until this is disabled.
+    // Gives a significant performance boost.
     al_hold_bitmap_drawing(true);
 
     int start_y = center_y - (height / 2);
@@ -89,6 +93,7 @@ void Display::draw_dungeon(
     int end_x = center_x + (width / 2);
     int end_y = center_y + (height / 2);
 
+    // Draw the designated "window" into the dungeon
     for (int y = center_y - (height / 2); y < end_y; y++)
     {
         for (int x = start_x; x < end_x; x++)
@@ -116,6 +121,7 @@ void Display::draw_dungeon(
         }
     }
 
+    // If a given entity shows up within the dungeon display window, draw it
     for (auto it = entities.begin(); it != entities.end(); ++it)
     {
         if (
@@ -133,6 +139,9 @@ void Display::draw_dungeon(
         }
     }
 
+    // Re-enable drawing, so that all the work we did above can be batched.
+    // We've essentially queued up a bunch of drawing work, to be done all at
+    // once.
     al_hold_bitmap_drawing(false);
 
     al_flip_display();
@@ -144,6 +153,7 @@ Display::~Display()
     {
         al_destroy_bitmap(it->second);
     }
+
     al_destroy_bitmap(tileset);
     al_destroy_display(display);
 }
