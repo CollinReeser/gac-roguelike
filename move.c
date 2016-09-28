@@ -21,6 +21,13 @@ int main(int argc, char** argv)
         return -1;
     }
 
+    ALLEGRO_BITMAP* tileset = al_load_bitmap("tileset.png");
+    if (!tileset)
+    {
+        fprintf(stderr, "failed to load tileset!\n");
+        return -1;
+    }
+
     const int DISP_WIDTH = 640;
     const int DISP_HEIGHT = 480;
 
@@ -34,13 +41,11 @@ int main(int argc, char** argv)
 
     al_clear_to_color(al_map_rgb(0,0,0));
 
-    ALLEGRO_BITMAP* tileset = al_load_bitmap("tileset.png");
-
     al_draw_tinted_bitmap_region(
         tileset,
         al_map_rgba(255, 255, 255, 255),
-        0, 64,
-        16, 16,
+        0, 32,
+        8, 16,
         0, 0,
         0
     );
@@ -53,7 +58,7 @@ int main(int argc, char** argv)
 
     int x = 0;
     int y = 0;
-    int x_max = DISP_WIDTH / 16 - 1;
+    int x_max = DISP_WIDTH / 8 - 1;
     int y_max = DISP_HEIGHT / 16 - 1;
     int color_red = 255;
     int color_green = 255;
@@ -86,6 +91,43 @@ int main(int argc, char** argv)
             if (event.keyboard.keycode == ALLEGRO_KEY_DOWN)
             {
                 y = (y < y_max) ? y + 1 : y_max;
+            }
+
+            if (event.keyboard.keycode == ALLEGRO_KEY_PAD_1)
+            {
+                x = (x > 0) ? x - 1 : 0;
+                y = (y < y_max) ? y + 1 : y_max;
+            }
+            if (event.keyboard.keycode == ALLEGRO_KEY_PAD_2)
+            {
+                y = (y < y_max) ? y + 1 : y_max;
+            }
+            if (event.keyboard.keycode == ALLEGRO_KEY_PAD_3)
+            {
+                x = (x < x_max) ? x + 1 : x_max;
+                y = (y < y_max) ? y + 1 : y_max;
+            }
+            if (event.keyboard.keycode == ALLEGRO_KEY_PAD_4)
+            {
+                x = (x > 0) ? x - 1 : 0;
+            }
+            if (event.keyboard.keycode == ALLEGRO_KEY_PAD_6)
+            {
+                x = (x < x_max) ? x + 1 : x_max;
+            }
+            if (event.keyboard.keycode == ALLEGRO_KEY_PAD_7)
+            {
+                x = (x > 0) ? x - 1 : 0;
+                y = (y > 0) ? y - 1 : 0;
+            }
+            if (event.keyboard.keycode == ALLEGRO_KEY_PAD_8)
+            {
+                y = (y > 0) ? y - 1 : 0;
+            }
+            if (event.keyboard.keycode == ALLEGRO_KEY_PAD_9)
+            {
+                x = (x < x_max) ? x + 1 : x_max;
+                y = (y > 0) ? y - 1 : 0;
             }
 
             if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
@@ -124,9 +166,9 @@ int main(int argc, char** argv)
             al_draw_tinted_bitmap_region(
                 tileset,
                 al_map_rgba(color_red, color_green, color_blue, 255),
-                0, 64,
-                16, 16,
-                x * 16, y * 16,
+                0, 32,
+                8, 16,
+                x * 8, y * 16,
                 0
             );
 
