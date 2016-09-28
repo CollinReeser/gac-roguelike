@@ -13,11 +13,14 @@ class Creature : public Entity
 {
 public:
     Creature(
+        char symbol,
         bool is_player, bool is_controllable,
-        uint64_t speed,
-        char symbol
+        int pos_x, int pos_y,
+        uint64_t speed
     );
     ~Creature();
+
+    void set_position(int x, int y);
 
 private:
     bool is_player;

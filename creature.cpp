@@ -9,14 +9,15 @@
 #include "creature.h"
 
 Creature::Creature(
+    char symbol,
     bool is_player, bool is_controllable,
-    uint64_t speed,
-    char symbol
+    int pos_x, int pos_y,
+    uint64_t speed
 ):
     is_player(is_player),
     is_controllable(is_controllable),
     speed(speed),
-    Entity(symbol, false)
+    Entity(symbol, false, pos_x, pos_y)
 {
 }
 

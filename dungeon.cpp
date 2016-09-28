@@ -21,7 +21,10 @@ void Dungeon::generate_dungeon()
     for (int64_t i = 0; i < height; i++)
     {
         dungeon.push_back(std::vector<Entity>());
-        dungeon[i].assign(width, Entity('#', false));
+        for (int64_t j = 0; j < width; j++)
+        {
+            dungeon[i].push_back(Entity('#', false, j, i));
+        }
     }
 
     printf("default width: %lu\n", width);
@@ -59,7 +62,7 @@ void Dungeon::generate_dungeon()
         {
             for (int64_t k = startx; k < endx; k++)
             {
-                dungeon[j][k] = Entity('.', true);
+                dungeon[j][k] = Entity('.', true, k, j);
             }
         }
     }

@@ -80,12 +80,18 @@ void Display::draw_dungeon(
     int width, int height, int center_x, int center_y,
     const Dungeon* dungeon, const std::vector<const Entity*> entities
 ) {
+    al_clear_to_color(al_map_rgb_f(0, 0, 0));
+
+    al_hold_bitmap_drawing(true);
+
     int start_y = center_y - (height / 2);
     int start_x = center_x - (width / 2);
+    int end_x = center_x + (width / 2);
+    int end_y = center_y + (height / 2);
 
-    for (int y = center_y - (height / 2); y < center_y + (height / 2); y++)
+    for (int y = center_y - (height / 2); y < end_y; y++)
     {
-        for (int x = start_x; x < center_x + (width / 2); x++)
+        for (int x = start_x; x < end_x; x++)
         {
             ALLEGRO_BITMAP* tile;
             if (
@@ -109,6 +115,25 @@ void Display::draw_dungeon(
             );
         }
     }
+
+    for (auto it = entities.begin(); it != entities.end(); ++it)
+    {
+        if (
+            (*it)->get_x() >= start_x && (*it)->get_x() <= end_x &&
+            (*it)->get_y() >= start_y && (*it)->get_y() <= end_y
+        ) {
+            al_draw_tinted_bitmap_region(
+                tilemap[(*it)->get_symbol()],
+                al_map_rgba(255, 255, 255, 255),
+                0, 0,
+                8, 16,
+                ((*it)->get_x() - start_x) * 8, ((*it)->get_y() - start_y) * 16,
+                0
+            );
+        }
+    }
+
+    al_hold_bitmap_drawing(false);
 
     al_flip_display();
 }

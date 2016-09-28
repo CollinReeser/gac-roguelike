@@ -24,8 +24,9 @@ public:
         const Dungeon* dungeon, const std::vector<const Entity*> entities
     );
 
-private:
     ALLEGRO_DISPLAY* display;
+
+private:
     ALLEGRO_BITMAP* tileset;
 
     std::unordered_map<char, ALLEGRO_BITMAP*> tilemap;
