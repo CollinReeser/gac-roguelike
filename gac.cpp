@@ -13,6 +13,15 @@
 
 using namespace std;
 
+void process_movement(int x, int y, Dungeon* dungeon, Creature* creature)
+{
+    if (dungeon->entity_at_index(x, y).is_passable())
+    {
+        creature->set_x(x);
+        creature->set_y(y);
+    }
+}
+
 bool take_input(
     ALLEGRO_EVENT_QUEUE* queue, Dungeon* dungeon, Creature* controllable
 ) {
@@ -29,33 +38,44 @@ bool take_input(
 
     if (event.type == ALLEGRO_EVENT_KEY_CHAR)
     {
-        if (event.keyboard.keycode == ALLEGRO_KEY_LEFT)
+        switch (event.keyboard.keycode)
         {
-            if (dungeon->entity_at_index(cur_x - 1, cur_y).is_passable())
-            {
-                controllable->set_x(cur_x - 1);
-            }
-        }
-        if (event.keyboard.keycode == ALLEGRO_KEY_RIGHT)
-        {
-            if (dungeon->entity_at_index(cur_x + 1, cur_y).is_passable())
-            {
-                controllable->set_x(cur_x + 1);
-            }
-        }
-        if (event.keyboard.keycode == ALLEGRO_KEY_UP)
-        {
-            if (dungeon->entity_at_index(cur_x, cur_y - 1).is_passable())
-            {
-                controllable->set_y(cur_y - 1);
-            }
-        }
-        if (event.keyboard.keycode == ALLEGRO_KEY_DOWN)
-        {
-            if (dungeon->entity_at_index(cur_x, cur_y + 1).is_passable())
-            {
-                controllable->set_y(cur_y + 1);
-            }
+        case ALLEGRO_KEY_LEFT:
+            process_movement(cur_x - 1, cur_y, dungeon, controllable);
+            break;
+        case ALLEGRO_KEY_RIGHT:
+            process_movement(cur_x + 1, cur_y, dungeon, controllable);
+            break;
+        case ALLEGRO_KEY_UP:
+            process_movement(cur_x, cur_y - 1, dungeon, controllable);
+            break;
+        case ALLEGRO_KEY_DOWN:
+            process_movement(cur_x, cur_y + 1, dungeon, controllable);
+            break;
+        case ALLEGRO_KEY_PAD_1:
+            process_movement(cur_x - 1, cur_y + 1, dungeon, controllable);
+            break;
+        case ALLEGRO_KEY_PAD_2:
+            process_movement(cur_x, cur_y + 1, dungeon, controllable);
+            break;
+        case ALLEGRO_KEY_PAD_3:
+            process_movement(cur_x + 1, cur_y + 1, dungeon, controllable);
+            break;
+        case ALLEGRO_KEY_PAD_4:
+            process_movement(cur_x - 1, cur_y, dungeon, controllable);
+            break;
+        case ALLEGRO_KEY_PAD_6:
+            process_movement(cur_x + 1, cur_y, dungeon, controllable);
+            break;
+        case ALLEGRO_KEY_PAD_7:
+            process_movement(cur_x - 1, cur_y - 1, dungeon, controllable);
+            break;
+        case ALLEGRO_KEY_PAD_8:
+            process_movement(cur_x, cur_y - 1, dungeon, controllable);
+            break;
+        case ALLEGRO_KEY_PAD_9:
+            process_movement(cur_x + 1, cur_y - 1, dungeon, controllable);
+            break;
         }
 
         if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
