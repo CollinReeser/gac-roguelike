@@ -24,6 +24,7 @@ public:
         const Dungeon* dungeon, const std::vector<const Entity*> entities
     );
     void draw_event_messages(std::vector<std::string> messages);
+    void update_screen();
 
     ALLEGRO_DISPLAY* display;
 

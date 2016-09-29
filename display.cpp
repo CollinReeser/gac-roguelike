@@ -147,8 +147,6 @@ void Display::draw_dungeon(
     // We've essentially queued up a bunch of drawing work, to be done all at
     // once.
     al_hold_bitmap_drawing(false);
-
-    al_flip_display();
 }
 
 void Display::draw_string(int x, int y, std::string str)
@@ -181,7 +179,10 @@ void Display::draw_event_messages(std::vector<std::string> messages)
     }
 
     al_hold_bitmap_drawing(false);
+}
 
+void Display::update_screen()
+{
     al_flip_display();
 }
 
