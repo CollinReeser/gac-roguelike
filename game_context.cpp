@@ -1,3 +1,6 @@
+#include <allegro5/allegro.h>
+
+#include <sstream>
 
 #include "creature.h"
 #include "game_context.h"
@@ -24,9 +27,8 @@ void process_movement(int x, int y, Dungeon* dungeon, Creature* creature)
     }
 }
 
-bool take_input(
-    ALLEGRO_EVENT_QUEUE* queue, Dungeon* dungeon, Creature* controllable
-) {
+bool GameContext::take_input(Creature* controllable)
+{
     ALLEGRO_EVENT event;
     al_wait_for_event(queue, &event);
 
@@ -40,6 +42,11 @@ bool take_input(
 
     if (event.type == ALLEGRO_EVENT_KEY_CHAR)
     {
+        std::ostringstream stream;
+        stream << "The key " << event.keyboard.keycode << " was pressed!";
+
+        event_messages.push_back(stream.str());
+
         switch (event.keyboard.keycode)
         {
         case ALLEGRO_KEY_LEFT:
@@ -116,12 +123,13 @@ void GameContext::game_loop()
     while (1)
     {
         display->draw_dungeon(
-            50, 20,
             player->get_x(), player->get_y(),
             dungeon, {player}
         );
 
-        bool exit_request = take_input(queue, dungeon, player);
+        display->draw_event_messages(event_messages);
+
+        bool exit_request = take_input(player);
 
         if (exit_request)
         {

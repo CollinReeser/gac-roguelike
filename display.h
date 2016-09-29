@@ -20,9 +20,10 @@ public:
     ~Display();
 
     void draw_dungeon(
-        int width, int height, int center_x, int center_y,
+        int center_x, int center_y,
         const Dungeon* dungeon, const std::vector<const Entity*> entities
     );
+    void draw_event_messages(std::vector<std::string> messages);
 
     ALLEGRO_DISPLAY* display;
 
@@ -33,11 +34,21 @@ private:
 
     const std::string tileset_filename;
 
-    const uint64_t DISP_WIDTH = 640;
-    const uint64_t DISP_HEIGHT = 480;
+    uint64_t disp_width;
+    uint64_t disp_height;
+
+    int dungeon_draw_height;
+    int dungeon_draw_width;
+
+    int tile_width;
+    int tile_height;
+    int tileset_width;
+    int tileset_height;
 
     void init() throw (std::runtime_error);
     void init_tilemap();
+
+    void draw_string(int x, int y, std::string str);
 };
 
 #endif

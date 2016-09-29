@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <vector>
 
+#include "creature.h"
 #include "display.h"
 
 class GameContext
@@ -18,9 +19,13 @@ public:
     void game_loop();
 
 private:
+    bool take_input(Creature* creature);
+
     Display* display;
     ALLEGRO_EVENT_QUEUE* queue;
     Dungeon* dungeon;
+
+    std::vector<std::string> event_messages;
 };
 
 #endif
