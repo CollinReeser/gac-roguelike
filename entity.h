@@ -1,9 +1,6 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include <allegro5/allegro.h>
-#include <allegro5/allegro_image.h>
-
 #include <stdint.h>
 #include <vector>
 

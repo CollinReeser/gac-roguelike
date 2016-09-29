@@ -1,6 +1,3 @@
-#include <allegro5/allegro.h>
-#include <allegro5/allegro_image.h>
-
 #include <stdexcept>
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,9 +24,6 @@ void Dungeon::generate_dungeon()
         }
     }
 
-    printf("default width: %lu\n", width);
-    printf("default height: %lu\n", height);
-
     for (int64_t i = 0; i < 10; i++)
     {
         uint64_t startx;
@@ -53,11 +47,6 @@ void Dungeon::generate_dungeon()
             endy = starty + 15;
         }
 
-        printf("startx: %lu\n", startx);
-        printf("starty: %lu\n", starty);
-        printf("endx: %lu\n", endx);
-        printf("endy: %lu\n", endy);
-
         for (int64_t j = starty; j < endy; j++)
         {
             for (int64_t k = startx; k < endx; k++)
@@ -66,8 +55,6 @@ void Dungeon::generate_dungeon()
             }
         }
     }
-
-    print_dungeon();
 }
 
 uint64_t Dungeon::get_width() const

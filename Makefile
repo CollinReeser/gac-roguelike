@@ -7,8 +7,8 @@ main: main.c
 move: move.c
 	clang move.c -o move -lallegro -lallegro_image
 
-gac: gac.cpp creature.cpp creature.h display.cpp display.h dungeon.cpp dungeon.h entity.cpp entity.h
-	clang++ -std=c++11 gac.cpp creature.cpp display.cpp dungeon.cpp entity.cpp -o gac -lallegro -lallegro_image
+gac: gac.cpp creature.cpp creature.h display.cpp display.h dungeon.cpp dungeon.h entity.cpp entity.h game_context.cpp game_context.h
+	clang++ -std=c++11 gac.cpp creature.cpp display.cpp dungeon.cpp entity.cpp game_context.cpp -o gac -lallegro -lallegro_image
 
 realclean:
 	rm -f *.o

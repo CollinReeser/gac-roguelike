@@ -1,9 +1,6 @@
 #ifndef CREATURE_H
 #define CREATURE_H
 
-#include <allegro5/allegro.h>
-#include <allegro5/allegro_image.h>
-
 #include <stdint.h>
 #include <vector>
 

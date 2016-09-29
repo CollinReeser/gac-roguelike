@@ -65,8 +65,6 @@ void Display::init_tilemap()
     for (int i = 0; i < char_rows.size(); i++) {
         for (int j = 0; j < tileset_char_width; j++)
         {
-            printf("i: %d, j: %d, c: %c\n", i, j, char_rows[i][j]);
-
             tilemap[char_rows[i][j]] = al_create_sub_bitmap(
                 tileset,
                 j * tile_width, (start_row_tileset + i) * tile_height,

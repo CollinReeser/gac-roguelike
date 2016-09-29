@@ -1,6 +1,3 @@
-#include <allegro5/allegro.h>
-#include <allegro5/allegro_image.h>
-
 #include <stdexcept>
 #include <stdio.h>
 #include <stdlib.h>
