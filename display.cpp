@@ -17,14 +17,13 @@ Display::Display():
     display(NULL),
     tileset(NULL),
     tileset_filename("tileset.png"),
-    dungeon_draw_width(50),
-    dungeon_draw_height(20),
     disp_width(640),
     disp_height(480),
+    dungeon_draw_width(50),
+    dungeon_draw_height(20),
     tile_width(8),
     tile_height(16),
-    tileset_width(32),
-    tileset_height(9)
+    tileset_width(32)
 {
     init();
 }
@@ -56,9 +55,6 @@ void Display::init() throw (std::runtime_error)
 
 void Display::init_tilemap()
 {
-    uint64_t tileset_char_width = 32;
-    uint64_t tileset_char_height = 9;
-
     // These rows match rows in the current tileset file, with any extraneous
     // spaces being placeholders for special characters.
     std::vector<std::string> char_rows = {
@@ -69,7 +65,7 @@ void Display::init_tilemap()
     uint64_t start_row_tileset = 1;
 
     for (int i = 0; i < char_rows.size(); i++) {
-        for (int j = 0; j < tileset_char_width; j++)
+        for (int j = 0; j < tileset_width; j++)
         {
             tilemap[char_rows[i][j]] = al_create_sub_bitmap(
                 tileset,

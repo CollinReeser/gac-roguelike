@@ -41,13 +41,12 @@ private:
     uint64_t disp_width;
     uint64_t disp_height;
 
-    int dungeon_draw_height;
     int dungeon_draw_width;
+    int dungeon_draw_height;
 
     int tile_width;
     int tile_height;
     int tileset_width;
-    int tileset_height;
 
     void init() throw (std::runtime_error);
     void init_tilemap();
