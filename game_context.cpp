@@ -129,7 +129,11 @@ bool GameContext::take_input(Creature* controllable)
 
 void GameContext::game_loop()
 {
-    auto player = get_player();
+    Creature* player;
+    if (!(player = get_player()))
+    {
+        return;
+    }
 
     creatures.push_back(
         new Creature(
@@ -170,7 +174,7 @@ void GameContext::game_loop()
 
 BREAK_GAME_LOOP:
 
-    delete player;
+    return;
 }
 
 Creature* GameContext::get_player()
@@ -188,4 +192,11 @@ GameContext::~GameContext()
 {
     delete display;
     delete dungeon;
+
+    for (auto it = creatures.begin(); it != creatures.end(); it++)
+    {
+        delete *it;
+    }
+
+    al_destroy_event_queue(queue);
 }
