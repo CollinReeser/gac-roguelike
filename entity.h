@@ -19,8 +19,6 @@ public:
 
 private:
     bool passable;
-    bool construction;
-    bool destructible;
     int pos_x;
     int pos_y;
 

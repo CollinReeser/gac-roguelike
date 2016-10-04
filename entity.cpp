@@ -6,12 +6,10 @@
 #include "entity.h"
 
 Entity::Entity(char symbol, bool passable, int pos_x, int pos_y):
-    symbol(symbol),
     passable(passable),
     pos_x(pos_x),
     pos_y(pos_y),
-    construction(true),
-    destructible(false)
+    symbol(symbol)
 {
 }
 
