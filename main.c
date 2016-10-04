@@ -6,10 +6,6 @@
 
 void fireplace(ALLEGRO_BITMAP* tileset, ALLEGRO_BITMAP* fire_bmp)
 {
-    int x = 0;
-    int y = 0;
-    int ticks = 0;
-
     al_draw_bitmap_region(tileset, 8 * 16, 12 * 16, 16, 16, 16, 412, 0);
 
     al_draw_bitmap_region(tileset, 13 * 16, 12 * 16, 16, 16, 32, 412, 0);
