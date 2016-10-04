@@ -30,7 +30,13 @@ void process_movement(int x, int y, Dungeon* dungeon, Creature* creature)
 bool GameContext::take_input(Creature* controllable)
 {
     ALLEGRO_EVENT event;
-    al_wait_for_event(queue, &event);
+
+    do {
+        al_wait_for_event(queue, &event);
+    } while(
+        event.type != ALLEGRO_EVENT_DISPLAY_CLOSE &&
+        event.type != ALLEGRO_EVENT_KEY_CHAR
+    );
 
     if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
     {
