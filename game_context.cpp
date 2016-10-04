@@ -1,6 +1,7 @@
 #include <allegro5/allegro.h>
 
 #include <sstream>
+#include <vector>
 
 #include "creature.h"
 #include "game_context.h"
@@ -15,6 +16,28 @@ GameContext::GameContext():
     );
     al_register_event_source(
         queue, al_get_display_event_source(display->display)
+    );
+
+    int free_pos_x;
+    int free_pos_y;
+    while (1)
+    {
+        int rand_x = rand() % dungeon->get_width();
+        int rand_y = rand() % dungeon->get_height();
+
+        if (dungeon->entity_at_index(rand_x, rand_y).is_passable())
+        {
+            free_pos_x = rand_x;
+            free_pos_y = rand_y;
+
+            break;
+        }
+    }
+
+    creatures.push_back(
+        new Creature(
+            '@', true, true, true, free_pos_x, free_pos_y, 50
+        )
     );
 }
 
@@ -106,46 +129,59 @@ bool GameContext::take_input(Creature* controllable)
 
 void GameContext::game_loop()
 {
-    int free_pos_x;
-    int free_pos_y;
-    while (1)
-    {
-        int rand_x = rand() % dungeon->get_width();
-        int rand_y = rand() % dungeon->get_height();
+    auto player = get_player();
 
-        if (dungeon->entity_at_index(rand_x, rand_y).is_passable())
-        {
-            free_pos_x = rand_x;
-            free_pos_y = rand_y;
+    creatures.push_back(
+        new Creature(
+            'B', false, true, true, player->get_x() + 1, player->get_y() - 1, 30
+        )
+    );
 
-            break;
-        }
-    }
-
-    Creature* player = new Creature(
-        '@', true, true, free_pos_x, free_pos_y, 50
+    creatures.push_back(
+        new Creature(
+            'C', false, true, true, player->get_x() - 1, player->get_y() + 1, 30
+        )
     );
 
     while (1)
     {
-        display->draw_dungeon(
-            player->get_x(), player->get_y(),
-            dungeon, {player}
-        );
-
-        display->draw_event_messages(event_messages);
-
-        display->update_screen();
-
-        bool exit_request = take_input(player);
-
-        if (exit_request)
+        for (auto it = creatures.begin(); it != creatures.end(); it++)
         {
-            break;
+            if ((*it)->is_controllable())
+            {
+                display->draw_dungeon(
+                    (*it)->get_x(), (*it)->get_y(),
+                    dungeon, creatures.cbegin(), creatures.cend()
+                );
+
+                display->draw_event_messages(event_messages);
+
+                display->update_screen();
+
+                bool exit_request = take_input(*it);
+
+                if (exit_request)
+                {
+                    goto BREAK_GAME_LOOP;
+                }
+            }
         }
     }
 
+BREAK_GAME_LOOP:
+
     delete player;
+}
+
+Creature* GameContext::get_player()
+{
+    for (auto it = creatures.begin(); it != creatures.end(); it++)
+    {
+        if ((*it)->is_player())
+        {
+            return *it;
+        }
+    }
 }
 
 GameContext::~GameContext()

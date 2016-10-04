@@ -7,15 +7,26 @@
 
 Creature::Creature(
     char symbol,
-    bool is_player, bool is_controllable,
+    bool player, bool controllable, bool friendly,
     int pos_x, int pos_y,
     uint64_t speed
 ):
-    is_player(is_player),
-    is_controllable(is_controllable),
+    player(player),
+    controllable(controllable),
+    friendly(friendly),
     speed(speed),
     Entity(symbol, false, pos_x, pos_y)
 {
+}
+
+bool Creature::is_player()
+{
+    return player;
+}
+
+bool Creature::is_controllable()
+{
+    return controllable;
 }
 
 Creature::~Creature()

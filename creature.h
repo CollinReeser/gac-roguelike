@@ -11,17 +11,21 @@ class Creature : public Entity
 public:
     Creature(
         char symbol,
-        bool is_player, bool is_controllable,
+        bool player, bool controllable, bool friendly,
         int pos_x, int pos_y,
         uint64_t speed
     );
     ~Creature();
 
+    bool is_player();
+    bool is_controllable();
+
     void set_position(int x, int y);
 
 private:
-    bool is_player;
-    bool is_controllable;
+    bool player;
+    bool controllable;
+    bool friendly;
 
     uint64_t speed;
 };

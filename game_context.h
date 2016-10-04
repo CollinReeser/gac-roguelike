@@ -9,6 +9,7 @@
 
 #include "creature.h"
 #include "display.h"
+#include "dungeon.h"
 
 class GameContext
 {
@@ -20,10 +21,12 @@ public:
 
 private:
     bool take_input(Creature* creature);
+    Creature* get_player();
 
     Display* display;
     ALLEGRO_EVENT_QUEUE* queue;
     Dungeon* dungeon;
+    std::vector<Creature*> creatures;
 
     std::vector<std::string> event_messages;
 };
