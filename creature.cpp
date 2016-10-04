@@ -29,6 +29,16 @@ bool Creature::is_controllable()
     return controllable;
 }
 
+bool Creature::is_turn(uint64_t clock_time)
+{
+    if (clock_time % speed == 0)
+    {
+        return true;
+    }
+
+    return false;
+}
+
 Creature::~Creature()
 {
 }

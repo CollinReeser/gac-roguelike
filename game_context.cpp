@@ -9,7 +9,8 @@
 GameContext::GameContext():
     display(new Display()),
     dungeon(new Dungeon()),
-    queue(al_create_event_queue())
+    queue(al_create_event_queue()),
+    clock_time(0)
 {
     al_register_event_source(
         queue, al_get_keyboard_event_source()
@@ -143,7 +144,7 @@ void GameContext::game_loop()
 
     creatures.push_back(
         new Creature(
-            'C', false, true, true, player->get_x() - 1, player->get_y() + 1, 30
+            'C', false, true, true, player->get_x() - 1, player->get_y() + 1, 15
         )
     );
 
@@ -151,25 +152,34 @@ void GameContext::game_loop()
     {
         for (auto it = creatures.begin(); it != creatures.end(); it++)
         {
-            if ((*it)->is_controllable())
+            if (!(*it)->is_turn(clock_time))
             {
-                display->draw_dungeon(
-                    (*it)->get_x(), (*it)->get_y(),
-                    dungeon, creatures.cbegin(), creatures.cend()
-                );
+                continue;
+            }
 
-                display->draw_event_messages(event_messages);
+            if (!(*it)->is_controllable())
+            {
+                continue;
+            }
 
-                display->update_screen();
+            display->draw_dungeon(
+                (*it)->get_x(), (*it)->get_y(),
+                dungeon, creatures.cbegin(), creatures.cend()
+            );
 
-                bool exit_request = take_input(*it);
+            display->draw_event_messages(event_messages);
 
-                if (exit_request)
-                {
-                    goto BREAK_GAME_LOOP;
-                }
+            display->update_screen();
+
+            bool exit_request = take_input(*it);
+
+            if (exit_request)
+            {
+                goto BREAK_GAME_LOOP;
             }
         }
+
+        clock_time += 5;
     }
 
 BREAK_GAME_LOOP:
@@ -186,6 +196,8 @@ Creature* GameContext::get_player()
             return *it;
         }
     }
+
+    return NULL;
 }
 
 GameContext::~GameContext()

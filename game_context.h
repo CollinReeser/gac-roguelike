@@ -24,9 +24,13 @@ private:
     Creature* get_player();
 
     Display* display;
-    ALLEGRO_EVENT_QUEUE* queue;
     Dungeon* dungeon;
+
+    ALLEGRO_EVENT_QUEUE* queue;
+
     std::vector<Creature*> creatures;
+
+    uint64_t clock_time;
 
     std::vector<std::string> event_messages;
 };
