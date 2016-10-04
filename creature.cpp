@@ -11,11 +11,11 @@ Creature::Creature(
     int pos_x, int pos_y,
     uint64_t speed
 ):
+    Entity(symbol, false, pos_x, pos_y),
     player(player),
     controllable(controllable),
     friendly(friendly),
-    speed(speed),
-    Entity(symbol, false, pos_x, pos_y)
+    speed(speed)
 {
 }
 
