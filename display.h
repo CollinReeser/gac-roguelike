@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 
+#include "creature.h"
 #include "dungeon.h"
 #include "entity.h"
 
@@ -21,7 +22,9 @@ public:
 
     void draw_dungeon(
         int center_x, int center_y,
-        const Dungeon* dungeon, const std::vector<const Entity*> entities
+        const Dungeon* dungeon,
+        std::vector<Creature*>::const_iterator creatures_it_begin,
+        std::vector<Creature*>::const_iterator creatures_it_end
     );
     void draw_event_messages(std::vector<std::string> messages);
     void update_screen();

@@ -9,9 +9,9 @@
 #include <string>
 #include <vector>
 
+#include "creature.h"
 #include "display.h"
 #include "dungeon.h"
-#include "entity.h"
 
 Display::Display():
     display(NULL),
@@ -84,10 +84,10 @@ void Display::init_tilemap()
 
 void Display::draw_dungeon(
     int center_x, int center_y,
-    const Dungeon* dungeon, const std::vector<const Entity*> entities
+    const Dungeon* dungeon,
+    std::vector<Creature*>::const_iterator creatures_it_begin,
+    std::vector<Creature*>::const_iterator creatures_it_end
 ) {
-    al_clear_to_color(al_map_rgb_f(0, 0, 0));
-
     // Defer actually "rendering" any drawing we do until this is disabled.
     // Gives a significant performance boost.
     al_hold_bitmap_drawing(true);
@@ -126,18 +126,21 @@ void Display::draw_dungeon(
     }
 
     // If a given entity shows up within the dungeon display window, draw it
-    for (auto it = entities.begin(); it != entities.end(); ++it)
+    for (; creatures_it_begin != creatures_it_end; ++creatures_it_begin)
     {
         if (
-            (*it)->get_x() >= start_x && (*it)->get_x() <= end_x &&
-            (*it)->get_y() >= start_y && (*it)->get_y() <= end_y
+            (*creatures_it_begin)->get_x() >= start_x &&
+            (*creatures_it_begin)->get_x() < end_x &&
+            (*creatures_it_begin)->get_y() >= start_y &&
+            (*creatures_it_begin)->get_y() < end_y
         ) {
             al_draw_tinted_bitmap_region(
-                tilemap[(*it)->get_symbol()],
+                tilemap[(*creatures_it_begin)->get_symbol()],
                 al_map_rgba(255, 255, 255, 255),
                 0, 0,
                 tile_width, tile_height,
-                ((*it)->get_x() - start_x) * tile_width, ((*it)->get_y() - start_y) * tile_height,
+                ((*creatures_it_begin)->get_x() - start_x) * tile_width,
+                ((*creatures_it_begin)->get_y() - start_y) * tile_height,
                 0
             );
         }
