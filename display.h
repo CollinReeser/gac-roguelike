@@ -46,6 +46,7 @@ private:
 
     int tile_width;
     int tile_height;
+    int tileset_height;
     int tileset_width;
 
     void init() throw (std::runtime_error);
