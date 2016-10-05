@@ -172,6 +172,50 @@ void Display::draw_event_messages(std::vector<std::string> messages)
     al_hold_bitmap_drawing(false);
 }
 
+void Display::draw_borders()
+{
+    // Try drawing a border
+    al_hold_bitmap_drawing(true);
+
+    // Bottom line
+    for (int i = 0; i < dungeon_draw_width; i++) {
+        al_draw_tinted_bitmap_region(
+            tilemap[196], // '─'
+            al_map_rgba(255, 255, 255, 255),
+            0, 0,
+            tile_width, tile_height,
+            i * tile_width, dungeon_draw_height * tile_height,
+            0
+        );
+    }
+
+    // Right side line
+    for (int i = 0; i < dungeon_draw_height; i++) {
+        al_draw_tinted_bitmap_region(
+            tilemap[179], // '│'
+            al_map_rgba(255, 255, 255, 255),
+            0, 0,
+            tile_width, tile_height,
+            dungeon_draw_width * tile_width, i * tile_height,
+            0
+        );
+    }
+
+    // Draw corner piece
+    al_draw_tinted_bitmap_region(
+        tilemap[217], // '┘'
+        al_map_rgba(255, 255, 255, 255),
+        0, 0,
+        tile_width, tile_height,
+        dungeon_draw_width * tile_width, dungeon_draw_height * tile_height,
+        0
+    );
+
+
+    al_hold_bitmap_drawing(false);
+
+}
+
 void Display::update_screen()
 {
     al_flip_display();

@@ -197,6 +197,8 @@ void GameContext::game_loop()
 
             display->draw_event_messages(event_messages);
 
+            display->draw_borders();
+
             display->update_screen();
 
             bool exit_request = take_input(*it);

@@ -27,6 +27,7 @@ public:
         std::vector<Creature*>::const_iterator creatures_it_end
     );
     void draw_event_messages(std::vector<std::string> messages);
+    void draw_borders();
     void update_screen();
 
     ALLEGRO_DISPLAY* display;
