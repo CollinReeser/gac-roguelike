@@ -191,11 +191,6 @@ void GameContext::game_loop()
         )
     );
 
-    // This only needs to happen once, until window resizing is supported. Just
-    // drawing this once only works because we take advantage of our grid-based
-    // tile drawing and don't ever actually clear the screen
-    display->draw_borders();
-
     while (1)
     {
         for (auto it = creatures.begin(); it != creatures.end(); it++)
@@ -216,6 +211,8 @@ void GameContext::game_loop()
             );
 
             display->draw_event_messages(event_messages);
+
+            display->draw_borders();
 
             display->update_screen();
 
