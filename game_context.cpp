@@ -37,7 +37,7 @@ GameContext::GameContext():
 
     creatures.push_back(
         new Creature(
-            '@', true, true, true, free_pos_x, free_pos_y, 50, 10
+            '@', "Glorzak", true, true, true, free_pos_x, free_pos_y, 50, 10
         )
     );
 }
@@ -70,9 +70,35 @@ void GameContext::conduct_melee_attack(Creature* source, Creature* target) {
 
     target->take_damage(damage);
 
+    std::ostringstream stream;
+
+    stream << "You hit the " << target->get_name() << " with your fists.";
+
+    event_messages.push_back(stream.str());
+    // Clear the sstream
+    stream.str(std::string());
+
+    stream << "The " << target->get_name();
+
     if (target->get_health() <= 0) {
         kill_creature_at_index(target->get_x(), target->get_y());
+
+        stream << " dies.";
     }
+    else if (target->get_health() >= target->get_max_health() * 0.8) {
+        stream << " is lightly wounded.";
+    }
+    else if (target->get_health() >= target->get_max_health() * 0.5) {
+        stream << " is moderately wounded.";
+    }
+    else if (target->get_health() >= target->get_max_health() * 0.3) {
+        stream << " is heavily wounded.";
+    }
+    else if (target->get_health() >= target->get_max_health() * 0.1) {
+        stream << " is gravely wounded.";
+    }
+
+    event_messages.push_back(stream.str());
 }
 
 void GameContext::process_movement(int x, int y, Creature* creature)
@@ -120,11 +146,6 @@ bool GameContext::take_input(Creature* controllable)
 
     if (event.type == ALLEGRO_EVENT_KEY_CHAR)
     {
-        std::ostringstream stream;
-        stream << "The key " << event.keyboard.keycode << " was pressed!";
-
-        event_messages.push_back(stream.str());
-
         switch (event.keyboard.keycode)
         {
         case ALLEGRO_KEY_LEFT:
@@ -186,7 +207,8 @@ void GameContext::game_loop()
 
     creatures.push_back(
         new Creature(
-            'g', false, false, false, player->get_x() + 2, player->get_y() - 2,
+            'g', "gobber", false, false, false,
+            player->get_x() + 2, player->get_y() - 2,
             100, 10
         )
     );

@@ -1,44 +1,43 @@
 #include <stdexcept>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string>
 #include <time.h>
 
 #include "creature.h"
 
 Creature::Creature(
-    char symbol,
+    char symbol, std::string name,
     bool player, bool controllable, bool friendly,
     int pos_x, int pos_y,
     uint64_t speed,
-    int64_t health
+    uint64_t max_health
 ):
     Entity(symbol, false, pos_x, pos_y),
+    name(name),
     player(player),
     controllable(controllable),
     friendly(friendly),
     speed(speed),
-    health(health),
+    max_health(max_health),
+    health(max_health),
     strength(1)
 {
 }
 
-bool Creature::is_player()
-{
+bool Creature::is_player() const {
     return player;
 }
 
-bool Creature::is_controllable()
-{
+bool Creature::is_controllable() const {
     return controllable;
 }
 
-bool Creature::is_friendly()
-{
+bool Creature::is_friendly() const {
     return friendly;
 }
 
-bool Creature::is_turn(uint64_t clock_time)
-{
+bool Creature::is_turn(uint64_t clock_time) const {
     if (clock_time % speed == 0)
     {
         return true;
@@ -47,11 +46,19 @@ bool Creature::is_turn(uint64_t clock_time)
     return false;
 }
 
-int64_t Creature::get_health() {
+int64_t Creature::get_health() const {
     return health;
 }
 
-uint64_t Creature::get_strength() {
+uint64_t Creature::get_max_health() const {
+    return max_health;
+}
+
+std::string Creature::get_name() const {
+    return std::string(name);
+}
+
+uint64_t Creature::get_strength() const {
     return strength;
 }
 
