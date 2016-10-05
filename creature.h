@@ -19,6 +19,7 @@ public:
 
     bool is_player();
     bool is_controllable();
+    bool is_friendly();
 
     bool is_turn(uint64_t clock_time);
 

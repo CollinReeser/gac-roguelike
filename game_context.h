@@ -23,6 +23,10 @@ private:
     bool take_input(Creature* creature);
     Creature* get_player();
 
+    void process_movement(int x, int y, Creature* creature);
+
+    Creature* creature_at_index(int x, int y);
+
     Display* display;
     Dungeon* dungeon;
 

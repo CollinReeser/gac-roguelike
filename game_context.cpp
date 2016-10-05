@@ -42,9 +42,37 @@ GameContext::GameContext():
     );
 }
 
-void process_movement(int x, int y, Dungeon* dungeon, Creature* creature)
+Creature* GameContext::creature_at_index(int x, int y)
 {
-    if (dungeon->entity_at_index(x, y).is_passable())
+    for (auto it = creatures.cbegin(); it != creatures.cend(); it++)
+    {
+        if ((*it)->get_x() == x && (*it)->get_y() == y)
+        {
+            return *it;
+        }
+    }
+
+    return NULL;
+}
+
+void GameContext::process_movement(int x, int y, Creature* creature)
+{
+    if (auto target = creature_at_index(x, y))
+    {
+        // Swap positions with the friendly creature
+        if (target->is_friendly())
+        {
+            target->set_x(creature->get_x());
+            target->set_y(creature->get_y());
+            creature->set_x(x);
+            creature->set_y(y);
+        }
+        else
+        {
+            // Melee attack the hostile target
+        }
+    }
+    else if (dungeon->entity_at_index(x, y).is_passable())
     {
         creature->set_x(x);
         creature->set_y(y);
@@ -80,40 +108,40 @@ bool GameContext::take_input(Creature* controllable)
         switch (event.keyboard.keycode)
         {
         case ALLEGRO_KEY_LEFT:
-            process_movement(cur_x - 1, cur_y, dungeon, controllable);
+            process_movement(cur_x - 1, cur_y, controllable);
             break;
         case ALLEGRO_KEY_RIGHT:
-            process_movement(cur_x + 1, cur_y, dungeon, controllable);
+            process_movement(cur_x + 1, cur_y, controllable);
             break;
         case ALLEGRO_KEY_UP:
-            process_movement(cur_x, cur_y - 1, dungeon, controllable);
+            process_movement(cur_x, cur_y - 1, controllable);
             break;
         case ALLEGRO_KEY_DOWN:
-            process_movement(cur_x, cur_y + 1, dungeon, controllable);
+            process_movement(cur_x, cur_y + 1, controllable);
             break;
         case ALLEGRO_KEY_PAD_1:
-            process_movement(cur_x - 1, cur_y + 1, dungeon, controllable);
+            process_movement(cur_x - 1, cur_y + 1, controllable);
             break;
         case ALLEGRO_KEY_PAD_2:
-            process_movement(cur_x, cur_y + 1, dungeon, controllable);
+            process_movement(cur_x, cur_y + 1, controllable);
             break;
         case ALLEGRO_KEY_PAD_3:
-            process_movement(cur_x + 1, cur_y + 1, dungeon, controllable);
+            process_movement(cur_x + 1, cur_y + 1, controllable);
             break;
         case ALLEGRO_KEY_PAD_4:
-            process_movement(cur_x - 1, cur_y, dungeon, controllable);
+            process_movement(cur_x - 1, cur_y, controllable);
             break;
         case ALLEGRO_KEY_PAD_6:
-            process_movement(cur_x + 1, cur_y, dungeon, controllable);
+            process_movement(cur_x + 1, cur_y, controllable);
             break;
         case ALLEGRO_KEY_PAD_7:
-            process_movement(cur_x - 1, cur_y - 1, dungeon, controllable);
+            process_movement(cur_x - 1, cur_y - 1, controllable);
             break;
         case ALLEGRO_KEY_PAD_8:
-            process_movement(cur_x, cur_y - 1, dungeon, controllable);
+            process_movement(cur_x, cur_y - 1, controllable);
             break;
         case ALLEGRO_KEY_PAD_9:
-            process_movement(cur_x + 1, cur_y - 1, dungeon, controllable);
+            process_movement(cur_x + 1, cur_y - 1, controllable);
             break;
         }
 
