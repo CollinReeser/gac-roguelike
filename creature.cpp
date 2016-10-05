@@ -9,13 +9,16 @@ Creature::Creature(
     char symbol,
     bool player, bool controllable, bool friendly,
     int pos_x, int pos_y,
-    uint64_t speed
+    uint64_t speed,
+    int64_t health
 ):
     Entity(symbol, false, pos_x, pos_y),
     player(player),
     controllable(controllable),
     friendly(friendly),
-    speed(speed)
+    speed(speed),
+    health(health),
+    strength(1)
 {
 }
 
@@ -42,6 +45,18 @@ bool Creature::is_turn(uint64_t clock_time)
     }
 
     return false;
+}
+
+int64_t Creature::get_health() {
+    return health;
+}
+
+uint64_t Creature::get_strength() {
+    return strength;
+}
+
+void Creature::take_damage(uint64_t damage) {
+    health -= damage;
 }
 
 Creature::~Creature()

@@ -24,8 +24,10 @@ private:
     Creature* get_player();
 
     void process_movement(int x, int y, Creature* creature);
+    void conduct_melee_attack(Creature* source, Creature* target);
 
     Creature* creature_at_index(int x, int y);
+    void kill_creature_at_index(int x, int y);
 
     Display* display;
     Dungeon* dungeon;

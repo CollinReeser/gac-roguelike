@@ -37,7 +37,7 @@ GameContext::GameContext():
 
     creatures.push_back(
         new Creature(
-            '@', true, true, true, free_pos_x, free_pos_y, 50
+            '@', true, true, true, free_pos_x, free_pos_y, 50, 10
         )
     );
 }
@@ -55,6 +55,26 @@ Creature* GameContext::creature_at_index(int x, int y)
     return NULL;
 }
 
+void GameContext::kill_creature_at_index(int x, int y) {
+    for (auto it = creatures.begin(); it != creatures.end(); it++) {
+        if ((*it)->get_x() == x && (*it)->get_y() == y) {
+            creatures.erase(it);
+
+            break;
+        }
+    }
+}
+
+void GameContext::conduct_melee_attack(Creature* source, Creature* target) {
+    auto damage = source->get_strength();
+
+    target->take_damage(damage);
+
+    if (target->get_health() <= 0) {
+        kill_creature_at_index(target->get_x(), target->get_y());
+    }
+}
+
 void GameContext::process_movement(int x, int y, Creature* creature)
 {
     if (auto target = creature_at_index(x, y))
@@ -69,7 +89,7 @@ void GameContext::process_movement(int x, int y, Creature* creature)
         }
         else
         {
-            // Melee attack the hostile target
+            conduct_melee_attack(creature, target);
         }
     }
     else if (dungeon->entity_at_index(x, y).is_passable())
@@ -166,13 +186,8 @@ void GameContext::game_loop()
 
     creatures.push_back(
         new Creature(
-            'B', false, true, true, player->get_x() + 1, player->get_y() - 1, 30
-        )
-    );
-
-    creatures.push_back(
-        new Creature(
-            'C', false, true, true, player->get_x() - 1, player->get_y() + 1, 15
+            'g', false, false, false, player->get_x() + 2, player->get_y() - 2,
+            100, 10
         )
     );
 
