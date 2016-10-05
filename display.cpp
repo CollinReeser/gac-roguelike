@@ -218,7 +218,11 @@ void Display::draw_borders()
 
 void Display::update_screen()
 {
+    // Draw the buffer we've been building to the user-visible display
     al_flip_display();
+
+    // Clear the buffer, to start from scratch on the next draw sequence
+    al_clear_to_color(al_map_rgb(0,0,0));
 }
 
 Display::~Display()
