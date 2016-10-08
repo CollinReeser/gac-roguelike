@@ -13,7 +13,12 @@ public:
     Creature(
         char symbol, std::string name,
         bool player, bool controllable, bool friendly,
-        int pos_x, int pos_y,
+        int64_t pos_x, int64_t pos_y,
+        uint64_t speed, uint64_t max_health
+    );
+    Creature(
+        char symbol, std::string name,
+        bool player, bool controllable, bool friendly,
         uint64_t speed, uint64_t max_health
     );
     ~Creature();
@@ -28,8 +33,6 @@ public:
     uint64_t get_max_health() const;
     std::string get_name() const;
     uint64_t get_strength() const;
-
-    void set_position(int x, int y);
 
     void take_damage(uint64_t damage);
 

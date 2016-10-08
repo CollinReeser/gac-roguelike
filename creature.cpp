@@ -9,11 +9,29 @@
 Creature::Creature(
     char symbol, std::string name,
     bool player, bool controllable, bool friendly,
-    int pos_x, int pos_y,
+    int64_t pos_x, int64_t pos_y,
     uint64_t speed,
     uint64_t max_health
 ):
     Entity(symbol, false, pos_x, pos_y),
+    name(name),
+    player(player),
+    controllable(controllable),
+    friendly(friendly),
+    speed(speed),
+    max_health(max_health),
+    health(max_health),
+    strength(1)
+{
+}
+
+Creature::Creature(
+    char symbol, std::string name,
+    bool player, bool controllable, bool friendly,
+    uint64_t speed,
+    uint64_t max_health
+):
+    Entity(symbol, false, -1, -1),
     name(name),
     player(player),
     controllable(controllable),

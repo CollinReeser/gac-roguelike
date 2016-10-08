@@ -43,7 +43,10 @@ GameContext::GameContext():
         )
     );
 
-    config->dump();
+    auto gobber = config->load_creature("gobber");
+    gobber->set_position(free_pos_x + 2, free_pos_y - 2);
+
+    creatures.push_back(gobber);
 }
 
 Creature* GameContext::creature_at_index(int x, int y)
@@ -112,10 +115,8 @@ void GameContext::process_movement(int x, int y, Creature* creature)
         // Swap positions with the friendly creature
         if (target->is_friendly())
         {
-            target->set_x(creature->get_x());
-            target->set_y(creature->get_y());
-            creature->set_x(x);
-            creature->set_y(y);
+            target->set_position(creature->get_x(), creature->get_y());
+            creature->set_position(x, y);
         }
         else
         {
@@ -124,8 +125,7 @@ void GameContext::process_movement(int x, int y, Creature* creature)
     }
     else if (dungeon->entity_at_index(x, y).is_passable())
     {
-        creature->set_x(x);
-        creature->set_y(y);
+        creature->set_position(x, y);
     }
 }
 
@@ -208,14 +208,6 @@ void GameContext::game_loop()
     {
         return;
     }
-
-    creatures.push_back(
-        new Creature(
-            'g', "gobber", false, false, false,
-            player->get_x() + 2, player->get_y() - 2,
-            100, 10
-        )
-    );
 
     while (1)
     {
