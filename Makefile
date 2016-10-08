@@ -1,17 +1,40 @@
-
 all: main move gac
 
+CC = clang -Wall
+CPPC = clang++ -Wall -std=c++11
+ALLEGRO_LIBS = -lallegro -lallegro_image
+
 main: main.c
-	clang -Wall main.c -o main -lallegro -lallegro_image
+	$(CC) main.c -o main $(ALLEGRO_LIBS)
 
 move: move.c
-	clang -Wall move.c -o move -lallegro -lallegro_image
+	$(CC) move.c -o move $(ALLEGRO_LIBS)
 
-gac: gac.cpp creature.cpp creature.h display.cpp display.h dungeon.cpp dungeon.h entity.cpp entity.h game_context.cpp game_context.h config.o
-	clang++ -Wall -std=c++11 gac.cpp config.o creature.cpp display.cpp dungeon.cpp entity.cpp game_context.cpp -o gac -lallegro -lallegro_image
+gac: gac.cpp config.o creature.o display.o dungeon.o entity.o game_context.o
+	$(CPPC) \
+	    gac.cpp \
+	    config.o creature.o display.o dungeon.o entity.o \
+	    game_context.o \
+	    $(ALLEGRO_LIBS) \
+	    -o gac
 
 config.o: config.cpp config.h json/src/json.hpp
-	clang++ -Wall -std=c++11 -c config.cpp -o config.o
+	$(CPPC) -c config.cpp -o config.o
+
+creature.o: creature.cpp creature.h
+	$(CPPC) -c creature.cpp -o creature.o
+
+display.o: display.cpp display.h
+	$(CPPC) -c display.cpp -o display.o
+
+dungeon.o: dungeon.cpp dungeon.h
+	$(CPPC) -c dungeon.cpp -o dungeon.o
+
+entity.o: entity.cpp entity.h
+	$(CPPC) -c entity.cpp -o entity.o
+
+game_context.o: game_context.cpp game_context.h
+	$(CPPC) -c game_context.cpp -o game_context.o
 
 realclean:
 	rm -f *.o
