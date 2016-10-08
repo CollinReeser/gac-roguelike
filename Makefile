@@ -1,11 +1,7 @@
-all: main gac
+all: gac
 
-CC = clang -Wall
 CPPC = clang++ -Wall -std=c++11
 ALLEGRO_LIBS = -lallegro -lallegro_image
-
-main: main.c
-	$(CC) main.c -o main $(ALLEGRO_LIBS)
 
 gac: gac.cpp config.o creature.o display.o dungeon.o entity.o game_context.o
 	$(CPPC) \
