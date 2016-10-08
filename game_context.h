@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <vector>
 
+#include "config.h"
 #include "creature.h"
 #include "display.h"
 #include "dungeon.h"
@@ -29,6 +30,7 @@ private:
     Creature* creature_at_index(int x, int y);
     void kill_creature_at_index(int x, int y);
 
+    Config* config;
     Display* display;
     Dungeon* dungeon;
 

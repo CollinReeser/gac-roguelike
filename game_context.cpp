@@ -3,10 +3,12 @@
 #include <sstream>
 #include <vector>
 
+#include "config.h"
 #include "creature.h"
 #include "game_context.h"
 
 GameContext::GameContext():
+    config(new Config()),
     display(new Display()),
     dungeon(new Dungeon()),
     queue(al_create_event_queue()),
@@ -40,6 +42,8 @@ GameContext::GameContext():
             '@', "Glorzak", true, true, true, free_pos_x, free_pos_y, 50, 10
         )
     );
+
+    config->dump();
 }
 
 Creature* GameContext::creature_at_index(int x, int y)

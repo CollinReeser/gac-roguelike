@@ -1,5 +1,6 @@
-#include <sstream>
 #include <fstream>
+#include <iostream>
+#include <sstream>
 
 #include "config.h"
 
@@ -13,7 +14,11 @@ Config::Config() {
     std::stringstream sstr;
     sstr << in.rdbuf();
 
-    auto j3 = json::parse(sstr.str());
+    creature_config = json::parse(sstr.str());
+}
+
+void Config::dump() {
+    std::cout << creature_config.dump(2) << std::endl;
 }
 
 Config::~Config() {
