@@ -206,10 +206,10 @@ void GameContext::ai_turn(Creature* player, Creature* creature) {
 
     //check to see if player is nearby
     if (creature_nearby(creature, player, 5)) {
+        if (creature_nearby(creature, player, 1)) {
+            conduct_melee_attack(creature, player);
+        }
         //move towards player
-        //left/right
-        //up/down
-        //diag
         move_towards(creature, player);
     } 
     else {
