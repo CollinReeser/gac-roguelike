@@ -29,8 +29,8 @@ entity.o: entity.cpp entity.h
 game_context.o: game_context.cpp game_context.h
 	$(CPPC) -c game_context.cpp -o game_context.o
 
-realclean:
+clean:
 	rm -f *.o
-	rm -f main
-	rm -f move
+
+realclean: clean
 	rm -f gac
