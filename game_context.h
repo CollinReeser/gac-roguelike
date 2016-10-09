@@ -26,9 +26,13 @@ private:
 
     void process_movement(int x, int y, Creature* creature);
     void conduct_melee_attack(Creature* source, Creature* target);
+    void ai_turn(Creature* player, Creature* creature);
+    bool creature_nearby(Creature* creat_a, Creature* creat_b, int thresh);
+    void move_towards(Creature* creat_a, Creature* creat_b);
 
     Creature* creature_at_index(int x, int y);
     void kill_creature_at_index(int x, int y);
+    bool index_is_unoccupied(int x, int y);
 
     Config* config;
     Display* display;

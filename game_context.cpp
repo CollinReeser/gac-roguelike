@@ -201,6 +201,69 @@ bool GameContext::take_input(Creature* controllable)
     return false;
 }
 
+void GameContext::ai_turn(Creature* player, Creature* creature) {
+    //check to see if player is nearby
+    if (creature_nearby(creature, player, 5)) {
+        //move towards player
+        //left/right
+        //up/down
+        //diag
+        move_towards(creature, player);
+    } 
+    else {
+        //wander()
+        return;
+    }
+}
+
+//Check to see if Creature A is within thresh of Creature B
+bool GameContext::creature_nearby(Creature* creat_a, Creature* creat_b, int thresh) {
+    if (
+        creat_a->get_x() + thresh >= creat_b->get_x() &&
+        creat_a->get_x() - thresh <= creat_b->get_x() &&
+        creat_a->get_y() + thresh >= creat_b->get_y() &&
+        creat_a->get_y() - thresh <= creat_b->get_y()
+    ) {
+        //printf("NEAR\n");
+        return true;
+    }
+    return false;
+}
+
+bool GameContext::index_is_unoccupied(int x, int y) {
+    if (
+        dungeon->entity_at_index(x, y).is_passable() &&
+        creature_at_index(x, y) == NULL
+    ) {
+        return true;
+    }
+    return false;
+}
+
+//Check to see what diretion to go
+void GameContext::move_towards(Creature* creat_a, Creature* creat_b) {
+    if (creat_a->get_x() > creat_b->get_x()) {
+        if (index_is_unoccupied(creat_a->get_x() - 1, creat_a->get_y())) {
+            creat_a->set_position(creat_a->get_x() - 1, creat_a->get_y());
+        }
+    } 
+    else if (creat_a->get_x() < creat_b->get_x()) {
+        if (index_is_unoccupied(creat_a->get_x() + 1, creat_a->get_y())) {
+            creat_a->set_position(creat_a->get_x() + 1, creat_a->get_y());
+        }
+    } 
+    else if (creat_a->get_y() > creat_b->get_y()) {
+        if (index_is_unoccupied(creat_a->get_x(), creat_a->get_y() - 1)) {
+            creat_a->set_position(creat_a->get_x(), creat_a->get_y() - 1);
+        }
+    }
+    else if (creat_a->get_y() < creat_b->get_y()) {
+        if (index_is_unoccupied(creat_a->get_x(), creat_a->get_y() + 1)) {
+            creat_a->set_position(creat_a->get_x(), creat_a->get_y() + 1);
+        }
+    }
+}
+
 void GameContext::game_loop()
 {
     Creature* player;
@@ -220,6 +283,7 @@ void GameContext::game_loop()
 
             if (!(*it)->is_controllable())
             {
+                ai_turn(player, *it);
                 continue;
             }
 
