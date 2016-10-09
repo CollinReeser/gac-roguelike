@@ -3,13 +3,17 @@ all: gac
 CPPC = clang++ -Wall -std=c++11
 ALLEGRO_LIBS = -lallegro -lallegro_image
 
-gac: gac.cpp config.o creature.o display.o dungeon.o entity.o game_context.o
+gac: gac.cpp animation.o config.o creature.o display.o dungeon.o entity.o \
+	game_context.o
 	$(CPPC) \
 	    gac.cpp \
-	    config.o creature.o display.o dungeon.o entity.o \
+	    animation.o config.o creature.o display.o dungeon.o entity.o \
 	    game_context.o \
 	    $(ALLEGRO_LIBS) \
 	    -o gac
+
+animation.o: animation.cpp animation.h
+	$(CPPC) -c animation.cpp -o animation.o
 
 config.o: config.cpp config.h json/src/json.hpp
 	$(CPPC) -c config.cpp -o config.o

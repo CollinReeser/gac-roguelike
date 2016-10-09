@@ -4,6 +4,7 @@
 #include <vector>
 #include <utility>
 
+#include "animation.h"
 #include "config.h"
 #include "creature.h"
 #include "game_context.h"
@@ -319,9 +320,12 @@ void GameContext::game_loop()
                 continue;
             }
 
+            std::vector<Animation*> animations;
+
             display->draw_dungeon(
                 (*it)->get_x(), (*it)->get_y(),
-                dungeon, creatures.cbegin(), creatures.cend()
+                dungeon, creatures.cbegin(), creatures.cend(),
+                animations
             );
 
             display->draw_event_messages(event_messages);

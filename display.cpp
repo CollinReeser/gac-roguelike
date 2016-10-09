@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 
+#include "animation.h"
 #include "creature.h"
 #include "display.h"
 #include "dungeon.h"
@@ -70,23 +71,39 @@ void Display::init_tilemap()
     tilemap[' '] = al_create_sub_bitmap(tileset, 0, 0, tile_width, tile_height);
 }
 
-void Display::draw_dungeon(
-    int center_x, int center_y,
-    const Dungeon* dungeon,
+void Display::draw_creatures(
+    int start_x, int start_y, int end_x, int end_y,
     std::vector<Creature*>::const_iterator creatures_it_begin,
     std::vector<Creature*>::const_iterator creatures_it_end
 ) {
-    // Defer actually "rendering" any drawing we do until this is disabled.
-    // Gives a significant performance boost.
-    al_hold_bitmap_drawing(true);
+    // If a given entity shows up within the dungeon display window, draw it
+    for (; creatures_it_begin != creatures_it_end; ++creatures_it_begin)
+    {
+        if (
+            (*creatures_it_begin)->get_x() >= start_x &&
+            (*creatures_it_begin)->get_x() < end_x &&
+            (*creatures_it_begin)->get_y() >= start_y &&
+            (*creatures_it_begin)->get_y() < end_y
+        ) {
+            al_draw_tinted_bitmap_region(
+                tilemap[(*creatures_it_begin)->get_symbol()],
+                al_map_rgba(255, 255, 255, 255),
+                0, 0,
+                tile_width, tile_height,
+                ((*creatures_it_begin)->get_x() - start_x) * tile_width,
+                ((*creatures_it_begin)->get_y() - start_y) * tile_height,
+                0
+            );
+        }
+    }
+}
 
-    int start_y = center_y - (dungeon_draw_height / 2);
-    int start_x = center_x - (dungeon_draw_width / 2);
-    int end_x = center_x + (dungeon_draw_width / 2);
-    int end_y = center_y + (dungeon_draw_height / 2);
-
+void Display::draw_dungeon_floor(
+    int start_x, int start_y, int end_x, int end_y,
+    const Dungeon* dungeon
+) {
     // Draw the designated "window" into the dungeon
-    for (int y = center_y - (dungeon_draw_height / 2); y < end_y; y++)
+    for (int y = start_y; y < end_y; y++)
     {
         for (int x = start_x; x < end_x; x++)
         {
@@ -112,32 +129,77 @@ void Display::draw_dungeon(
             );
         }
     }
+}
 
-    // If a given entity shows up within the dungeon display window, draw it
-    for (; creatures_it_begin != creatures_it_end; ++creatures_it_begin)
-    {
-        if (
-            (*creatures_it_begin)->get_x() >= start_x &&
-            (*creatures_it_begin)->get_x() < end_x &&
-            (*creatures_it_begin)->get_y() >= start_y &&
-            (*creatures_it_begin)->get_y() < end_y
-        ) {
-            al_draw_tinted_bitmap_region(
-                tilemap[(*creatures_it_begin)->get_symbol()],
-                al_map_rgba(255, 255, 255, 255),
-                0, 0,
-                tile_width, tile_height,
-                ((*creatures_it_begin)->get_x() - start_x) * tile_width,
-                ((*creatures_it_begin)->get_y() - start_y) * tile_height,
-                0
-            );
-        }
+void Display::draw_animation(
+    int start_x, int start_y, int end_x, int end_y,
+    const Animation* animation
+) {
+    switch (animation->get_animation_type()) {
+    case DRAGON_FIRE:
+        break;
+    case PROJECTILE:
+        break;
+    default:
+        break;
+    }
+}
+
+void Display::draw_dungeon(
+    int center_x, int center_y,
+    const Dungeon* dungeon,
+    std::vector<Creature*>::const_iterator creatures_it_begin,
+    std::vector<Creature*>::const_iterator creatures_it_end,
+    std::vector<Animation*> animations
+) {
+    // Defer actually "rendering" any drawing we do until this is disabled.
+    // Gives a significant performance boost.
+    al_hold_bitmap_drawing(true);
+
+    int start_x = center_x - (dungeon_draw_width / 2);
+    int start_y = center_y - (dungeon_draw_height / 2);
+    int end_x = center_x + (dungeon_draw_width / 2);
+    int end_y = center_y + (dungeon_draw_height / 2);
+
+    draw_dungeon_floor(start_x, start_y, end_x, end_y, dungeon);
+
+    draw_creatures(
+        start_x, start_y, end_x, end_y,
+        creatures_it_begin, creatures_it_end
+    );
+
+    for (auto it = animations.cbegin(); it != animations.cend(); it++) {
+        draw_animation(start_x, start_y, end_x, end_y, *it);
+
+        clear_dungeon();
+
+        // Draw the buffer we've been building to the user-visible display
+        al_flip_display();
+
+        draw_dungeon_floor(start_x, start_y, end_x, end_y, dungeon);
+
+        draw_creatures(
+            start_x, start_y, end_x, end_y,
+            creatures_it_begin, creatures_it_end
+        );
     }
 
     // Re-enable drawing, so that all the work we did above can be batched.
     // We've essentially queued up a bunch of drawing work, to be done all at
     // once.
     al_hold_bitmap_drawing(false);
+}
+
+void Display::clear_dungeon()
+{
+    al_draw_scaled_bitmap(
+        tilemap[' '],
+        0, 0,
+        tile_width, tile_height,
+        0, 0,
+        dungeon_draw_width * tile_width, dungeon_draw_height * tile_height,
+        0
+    );
 }
 
 void Display::draw_string(int x, int y, std::string str)

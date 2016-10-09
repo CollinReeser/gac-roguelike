@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 
+#include "animation.h"
 #include "creature.h"
 #include "dungeon.h"
 #include "entity.h"
@@ -24,7 +25,8 @@ public:
         int center_x, int center_y,
         const Dungeon* dungeon,
         std::vector<Creature*>::const_iterator creatures_it_begin,
-        std::vector<Creature*>::const_iterator creatures_it_end
+        std::vector<Creature*>::const_iterator creatures_it_end,
+        std::vector<Animation*> animations
     );
     void draw_event_messages(std::vector<std::string> messages);
     void draw_borders();
@@ -54,6 +56,24 @@ private:
     void init_tilemap();
 
     void draw_string(int x, int y, std::string str);
+
+    void draw_animation(
+        int start_x, int start_y, int end_x, int end_y,
+        const Animation* animation
+    );
+
+    void clear_dungeon();
+
+    void draw_creatures(
+        int start_x, int start_y, int end_x, int end_y,
+        std::vector<Creature*>::const_iterator creatures_it_begin,
+        std::vector<Creature*>::const_iterator creatures_it_end
+    );
+
+    void draw_dungeon_floor(
+        int start_x, int start_y, int end_x, int end_y,
+        const Dungeon* dungeon
+    );
 };
 
 #endif
