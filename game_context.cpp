@@ -98,10 +98,10 @@ void GameContext::conduct_melee_attack(Creature* source, Creature* target) {
     else if (target->get_health() >= target->get_max_health() * 0.5) {
         stream << " is moderately wounded.";
     }
-    else if (target->get_health() >= target->get_max_health() * 0.3) {
+    else if (target->get_health() >= target->get_max_health() * 0.2) {
         stream << " is heavily wounded.";
     }
-    else if (target->get_health() >= target->get_max_health() * 0.1) {
+    else {
         stream << " is gravely wounded.";
     }
 
