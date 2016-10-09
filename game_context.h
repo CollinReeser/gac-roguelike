@@ -29,6 +29,7 @@ private:
     void ai_turn(Creature* player, Creature* creature);
     bool creature_nearby(Creature* creat_a, Creature* creat_b, int thresh);
     void move_towards(Creature* creat_a, Creature* creat_b);
+    void wander(Creature* creature);
 
     Creature* creature_at_index(int x, int y);
     void kill_creature_at_index(int x, int y);

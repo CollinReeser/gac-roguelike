@@ -2,6 +2,7 @@
 
 #include <sstream>
 #include <vector>
+#include <utility>
 
 #include "config.h"
 #include "creature.h"
@@ -202,6 +203,7 @@ bool GameContext::take_input(Creature* controllable)
 }
 
 void GameContext::ai_turn(Creature* player, Creature* creature) {
+
     //check to see if player is nearby
     if (creature_nearby(creature, player, 5)) {
         //move towards player
@@ -211,8 +213,7 @@ void GameContext::ai_turn(Creature* player, Creature* creature) {
         move_towards(creature, player);
     } 
     else {
-        //wander()
-        return;
+        wander(creature);
     }
 }
 
@@ -261,6 +262,35 @@ void GameContext::move_towards(Creature* creat_a, Creature* creat_b) {
         if (index_is_unoccupied(creat_a->get_x(), creat_a->get_y() + 1)) {
             creat_a->set_position(creat_a->get_x(), creat_a->get_y() + 1);
         }
+    }
+}
+
+/*
+    have a Creature wander into a new space
+
+    1 2 3
+    4 X 5   Pick one of the numbered spots to move into
+    6 7 8
+*/
+void GameContext::wander(Creature* creature) {
+
+    std::vector<std::pair<int,int>> spaces;
+
+    int x = -1;
+    while (x < 2) {
+        int y = -1;
+        while (y < 2) {
+            if (index_is_unoccupied(creature->get_x() + x, creature->get_y() + y)) {
+                spaces.push_back(std::make_pair(creature->get_x() + x, creature->get_y() + y));
+            }
+            y++;
+        }
+        x++;
+    }
+
+    if (!spaces.empty()) {
+        int r = rand() % spaces.size();
+        creature->set_position(spaces[r].first, spaces[r].second);
     }
 }
 
