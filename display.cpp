@@ -25,7 +25,9 @@ Display::Display():
     tile_width(8),
     tile_height(16),
     tileset_height(8),
-    tileset_width(32)
+    tileset_width(32),
+    disp_tile_width(disp_width / tile_width),
+    disp_tile_height(disp_height / tile_height)
 {
     init();
 }
@@ -285,6 +287,22 @@ void Display::update_screen()
 
     // Clear the buffer, to start from scratch on the next draw sequence
     al_clear_to_color(al_map_rgb(0,0,0));
+}
+
+void Display::draw_game_over() {
+    al_clear_to_color(al_map_rgb(0,0,0));
+
+    std::string game_over_str("YOU DIED");
+
+    draw_string(
+        disp_tile_width / 2 - game_over_str.size() / 2,
+        disp_tile_height / 2 - 1,
+        game_over_str
+    );
+
+    al_flip_display();
+
+    al_rest(3);
 }
 
 Display::~Display()

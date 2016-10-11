@@ -214,7 +214,7 @@ void GameContext::ai_turn(Creature* player, Creature* creature) {
             //move towards player
             move_towards(creature, player);
         }
-    } 
+    }
     else {
         wander(creature);
     }
@@ -250,12 +250,12 @@ void GameContext::move_towards(Creature* creat_a, Creature* creat_b) {
         if (index_is_unoccupied(creat_a->get_x() - 1, creat_a->get_y())) {
             creat_a->set_position(creat_a->get_x() - 1, creat_a->get_y());
         }
-    } 
+    }
     else if (creat_a->get_x() < creat_b->get_x()) {
         if (index_is_unoccupied(creat_a->get_x() + 1, creat_a->get_y())) {
             creat_a->set_position(creat_a->get_x() + 1, creat_a->get_y());
         }
-    } 
+    }
     else if (creat_a->get_y() > creat_b->get_y()) {
         if (index_is_unoccupied(creat_a->get_x(), creat_a->get_y() - 1)) {
             creat_a->set_position(creat_a->get_x(), creat_a->get_y() - 1);
@@ -299,16 +299,16 @@ void GameContext::wander(Creature* creature) {
 
 void GameContext::game_loop()
 {
-    Creature* player;
-    if (!(player = get_player()))
-    {
-        return;
-    }
-
     while (1)
     {
         for (auto it = creatures.begin(); it != creatures.end(); it++)
         {
+            Creature* player;
+            if (!(player = get_player()))
+            {
+                goto PLAYER_DIED;
+            }
+
             if (!(*it)->is_turn(clock_time))
             {
                 continue;
@@ -345,6 +345,10 @@ void GameContext::game_loop()
         clock_time += 5;
     }
 
+PLAYER_DIED:
+
+    player_died();
+
 BREAK_GAME_LOOP:
 
     return;
@@ -361,6 +365,10 @@ Creature* GameContext::get_player()
     }
 
     return NULL;
+}
+
+void GameContext::player_died() {
+    display->draw_game_over();
 }
 
 GameContext::~GameContext()

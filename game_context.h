@@ -35,6 +35,8 @@ private:
     void kill_creature_at_index(int x, int y);
     bool index_is_unoccupied(int x, int y);
 
+    void player_died();
+
     Config* config;
     Display* display;
     Dungeon* dungeon;

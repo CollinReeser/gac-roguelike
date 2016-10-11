@@ -28,8 +28,9 @@ public:
         std::vector<Creature*>::const_iterator creatures_it_end,
         std::vector<Animation*> animations
     );
-    void draw_event_messages(std::vector<std::string> messages);
     void draw_borders();
+    void draw_event_messages(std::vector<std::string> messages);
+    void draw_game_over();
     void update_screen();
 
     ALLEGRO_DISPLAY* display;
@@ -44,13 +45,16 @@ private:
     uint64_t disp_width;
     uint64_t disp_height;
 
-    int dungeon_draw_width;
-    int dungeon_draw_height;
+    uint64_t dungeon_draw_width;
+    uint64_t dungeon_draw_height;
 
-    int tile_width;
-    int tile_height;
-    int tileset_height;
-    int tileset_width;
+    uint64_t tile_width;
+    uint64_t tile_height;
+    uint64_t tileset_height;
+    uint64_t tileset_width;
+
+    uint64_t disp_tile_width;
+    uint64_t disp_tile_height;
 
     void init() throw (std::runtime_error);
     void init_tilemap();
