@@ -41,17 +41,12 @@ GameContext::GameContext():
 
     creatures.push_back(
         new Creature(
-            '@', "Glorzak", true, true, true, free_pos_x, free_pos_y, 50, 10
+            '@', "Glorzak", true, true, true, free_pos_x, free_pos_y, 50, 100
         )
     );
-
-    auto gobber = config->load_creature("gobber");
-    gobber->set_position(free_pos_x + 2, free_pos_y - 2);
-
-    creatures.push_back(gobber);
 }
 
-Creature* GameContext::creature_at_index(int x, int y)
+Creature* GameContext::creature_at_index(uint64_t x, uint64_t y)
 {
     for (auto it = creatures.cbegin(); it != creatures.cend(); it++)
     {
@@ -64,7 +59,7 @@ Creature* GameContext::creature_at_index(int x, int y)
     return NULL;
 }
 
-void GameContext::kill_creature_at_index(int x, int y) {
+void GameContext::kill_creature_at_index(uint64_t x, uint64_t y) {
     for (auto it = creatures.begin(); it != creatures.end(); it++) {
         if ((*it)->get_x() == x && (*it)->get_y() == y) {
             creatures.erase(it);
@@ -81,37 +76,50 @@ void GameContext::conduct_melee_attack(Creature* source, Creature* target) {
 
     std::ostringstream stream;
 
-    stream << "You hit the " << target->get_name() << " with your fists.";
+    if (source->is_player()) {
+        stream << "You hit the " << target->get_name() << " with your fists. ";
+    }
+    else {
+        stream << "The " << source->get_name() << " hits ";
+        if (target->is_player()) {
+            stream << "you ";
+        }
+        else {
+            stream << "the " << target->get_name() << " ";
+        }
+        stream << "with its fists. ";
+    }
 
-    event_messages.push_back(stream.str());
-    // Clear the sstream
-    stream.str(std::string());
 
-    stream << "The " << target->get_name();
+    if (!target->is_player()) {
+        stream << "The " << target->get_name();
+
+        if (target->get_health() >= target->get_max_health() * 0.8) {
+            stream << " is lightly wounded.";
+        }
+        else if (target->get_health() >= target->get_max_health() * 0.5) {
+            stream << " is moderately wounded.";
+        }
+        else if (target->get_health() >= target->get_max_health() * 0.2) {
+            stream << " is heavily wounded.";
+        }
+        else if (target->get_health() > 0) {
+            stream << " is gravely wounded.";
+        }
+        else {
+            stream << " dies.";
+        }
+    }
 
     if (target->get_health() <= 0) {
         kill_creature_at_index(target->get_x(), target->get_y());
-
-        stream << " dies.";
-    }
-    else if (target->get_health() >= target->get_max_health() * 0.8) {
-        stream << " is lightly wounded.";
-    }
-    else if (target->get_health() >= target->get_max_health() * 0.5) {
-        stream << " is moderately wounded.";
-    }
-    else if (target->get_health() >= target->get_max_health() * 0.2) {
-        stream << " is heavily wounded.";
-    }
-    else {
-        stream << " is gravely wounded.";
+        delete target;
     }
 
     event_messages.push_back(stream.str());
 }
 
-void GameContext::process_movement(int x, int y, Creature* creature)
-{
+void GameContext::process_movement(uint64_t x, uint64_t y, Creature* creature) {
     if (auto target = creature_at_index(x, y))
     {
         // Swap positions with the friendly creature
@@ -221,7 +229,9 @@ void GameContext::ai_turn(Creature* player, Creature* creature) {
 }
 
 //Check to see if Creature A is within thresh of Creature B
-bool GameContext::creature_nearby(Creature* creat_a, Creature* creat_b, int thresh) {
+bool GameContext::creature_nearby(
+    Creature* creat_a, Creature* creat_b, uint64_t thresh
+) {
     if (
         creat_a->get_x() + thresh >= creat_b->get_x() &&
         creat_a->get_x() - thresh <= creat_b->get_x() &&
@@ -234,7 +244,12 @@ bool GameContext::creature_nearby(Creature* creat_a, Creature* creat_b, int thre
     return false;
 }
 
-bool GameContext::index_is_unoccupied(int x, int y) {
+bool GameContext::index_is_unoccupied(uint64_t x, uint64_t y) {
+
+    if (x >= dungeon->get_width() || y >= dungeon->get_height()) {
+        return false;
+    }
+
     if (
         dungeon->entity_at_index(x, y).is_passable() &&
         creature_at_index(x, y) == NULL
@@ -301,6 +316,21 @@ void GameContext::game_loop()
 {
     while (1)
     {
+        if (clock_time % 100 == 0) {
+            uint64_t x = rand() % dungeon->get_width();
+            uint64_t y = rand() % dungeon->get_height();
+
+            if (index_is_unoccupied(x, y)) {
+                auto creature = config->load_random_creature();
+                creature->set_position(
+                    rand() % dungeon->get_width(),
+                    rand() % dungeon->get_height()
+                );
+
+                creatures.push_back(creature);
+            }
+        }
+
         for (auto it = creatures.begin(); it != creatures.end(); it++)
         {
             Creature* player;

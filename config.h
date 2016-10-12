@@ -16,6 +16,7 @@ public:
     void dump();
 
     Creature* load_creature(std::string name);
+    Creature* load_random_creature();
 
 private:
     nlohmann::json creature_config;

@@ -24,16 +24,16 @@ private:
     bool take_input(Creature* creature);
     Creature* get_player();
 
-    void process_movement(int x, int y, Creature* creature);
+    void process_movement(uint64_t x, uint64_t y, Creature* creature);
     void conduct_melee_attack(Creature* source, Creature* target);
     void ai_turn(Creature* player, Creature* creature);
-    bool creature_nearby(Creature* creat_a, Creature* creat_b, int thresh);
+    bool creature_nearby(Creature* creat_a, Creature* creat_b, uint64_t thresh);
     void move_towards(Creature* creat_a, Creature* creat_b);
     void wander(Creature* creature);
 
-    Creature* creature_at_index(int x, int y);
-    void kill_creature_at_index(int x, int y);
-    bool index_is_unoccupied(int x, int y);
+    Creature* creature_at_index(uint64_t x, uint64_t y);
+    void kill_creature_at_index(uint64_t x, uint64_t y);
+    bool index_is_unoccupied(uint64_t x, uint64_t y);
 
     void player_died();
 

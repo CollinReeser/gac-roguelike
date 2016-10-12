@@ -39,6 +39,19 @@ Creature* Config::load_creature(std::string name) {
     );
 }
 
+Creature* Config::load_random_creature() {
+    auto i = 0;
+    auto index = rand() % creature_config.size();
+
+    for (auto it = creature_config.begin(); ; it++, i++) {
+        if (i == index) {
+            return load_creature(it.key());
+        }
+    }
+
+    return NULL;
+}
+
 Config::~Config() {
 
 }
