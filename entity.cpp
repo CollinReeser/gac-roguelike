@@ -1,3 +1,5 @@
+#include <allegro5/allegro.h>
+
 #include <stdexcept>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,8 +11,26 @@ Entity::Entity(char symbol, bool passable, int64_t pos_x, int64_t pos_y):
     passable(passable),
     pos_x(pos_x),
     pos_y(pos_y),
-    symbol(symbol)
+    symbol(symbol),
+    color(al_map_rgb(255, 255, 255))
 {
+}
+
+Entity::Entity(
+    char symbol, ALLEGRO_COLOR color, bool passable,
+    int64_t pos_x, int64_t pos_y
+):
+    passable(passable),
+    pos_x(pos_x),
+    pos_y(pos_y),
+    symbol(symbol),
+    color(color)
+{
+
+}
+
+ALLEGRO_COLOR Entity::get_color() const {
+    return color;
 }
 
 char Entity::get_symbol() const

@@ -1,6 +1,8 @@
 #ifndef CREATURE_H
 #define CREATURE_H
 
+#include <allegro5/allegro.h>
+
 #include <stdint.h>
 #include <string>
 #include <vector>
@@ -17,7 +19,7 @@ public:
         uint64_t speed, uint64_t max_health
     );
     Creature(
-        char symbol, std::string name,
+        char symbol, std::string name, ALLEGRO_COLOR color,
         bool player, bool controllable, bool friendly,
         uint64_t speed, uint64_t max_health
     );

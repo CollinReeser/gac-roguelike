@@ -1,3 +1,5 @@
+#include <allegro5/allegro.h>
+
 #include <stdexcept>
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,12 +28,12 @@ Creature::Creature(
 }
 
 Creature::Creature(
-    char symbol, std::string name,
+    char symbol, std::string name, ALLEGRO_COLOR color,
     bool player, bool controllable, bool friendly,
     uint64_t speed,
     uint64_t max_health
 ):
-    Entity(symbol, false, -1, -1),
+    Entity(symbol, color, false, -1, -1),
     name(name),
     player(player),
     controllable(controllable),

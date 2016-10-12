@@ -1,3 +1,5 @@
+#include <allegro5/allegro.h>
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -34,8 +36,15 @@ Creature* Config::load_creature(std::string name) {
 
     uint64_t speed = cfg["speed"];
 
+    ALLEGRO_COLOR color = al_map_rgb(255, 255, 255);
+
+    if (cfg.find("color") != cfg.end()) {
+        auto color_values = cfg["color"];
+        color = al_map_rgb(color_values[0], color_values[1], color_values[2]);
+    }
+
     return new Creature(
-        symbol, name, false, false, false, speed, max_health
+        symbol, name, color, false, false, false, speed, max_health
     );
 }
 

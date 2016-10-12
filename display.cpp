@@ -89,7 +89,7 @@ void Display::draw_creatures(
         ) {
             al_draw_tinted_bitmap_region(
                 tilemap[(*creatures_it_begin)->get_symbol()],
-                al_map_rgba(255, 255, 255, 255),
+                (*creatures_it_begin)->get_color(),
                 0, 0,
                 tile_width, tile_height,
                 ((*creatures_it_begin)->get_x() - start_x) * tile_width,
