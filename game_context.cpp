@@ -322,10 +322,7 @@ void GameContext::game_loop()
 
             if (index_is_unoccupied(x, y)) {
                 auto creature = config->load_random_creature();
-                creature->set_position(
-                    rand() % dungeon->get_width(),
-                    rand() % dungeon->get_height()
-                );
+                creature->set_position(x, y);
 
                 creatures.push_back(creature);
             }
