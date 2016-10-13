@@ -143,12 +143,31 @@ bool GameContext::take_input(Creature* controllable)
 {
     ALLEGRO_EVENT event;
 
-    do {
+    bool event_is_populated = false;
+
+    if (!al_is_event_queue_empty(queue)) {
+        al_get_next_event(queue, &event);
+
+        if (
+            event.type == ALLEGRO_EVENT_DISPLAY_CLOSE ||
+            event.type == ALLEGRO_EVENT_KEY_CHAR
+        ) {
+            al_flush_event_queue(queue);
+            event_is_populated = true;
+        }
+    }
+
+    while (
+        !event_is_populated ||
+        (
+            event.type != ALLEGRO_EVENT_DISPLAY_CLOSE &&
+            event.type != ALLEGRO_EVENT_KEY_CHAR
+        )
+    ) {
+        event_is_populated = true;
+
         al_wait_for_event(queue, &event);
-    } while(
-        event.type != ALLEGRO_EVENT_DISPLAY_CLOSE &&
-        event.type != ALLEGRO_EVENT_KEY_CHAR
-    );
+    }
 
     if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
     {
