@@ -366,12 +366,19 @@ void GameContext::game_loop()
                 continue;
             }
 
-            std::vector<Animation*> animations;
+            display->draw_animation(
+                (*it)->get_x(), (*it)->get_y(),
+                dungeon, creatures.cbegin(), creatures.cend(),
+                new Animation(
+                    AnimationType::PROJECTILE,
+                    &dungeon->entity_at_index(10, 10),
+                    &dungeon->entity_at_index(20, 20)
+                )
+            );
 
             display->draw_dungeon(
                 (*it)->get_x(), (*it)->get_y(),
-                dungeon, creatures.cbegin(), creatures.cend(),
-                animations
+                dungeon, creatures.cbegin(), creatures.cend()
             );
 
             display->draw_event_messages(event_messages);

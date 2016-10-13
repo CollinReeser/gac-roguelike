@@ -5,8 +5,9 @@
 #include <stdexcept>
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include <string>
+#include <time.h>
+#include <unistd.h>
 #include <vector>
 
 #include "animation.h"
@@ -133,17 +134,120 @@ void Display::draw_dungeon_floor(
     }
 }
 
+void Display::draw_projectile_animation(
+    int center_x, int center_y,
+    const Dungeon* dungeon,
+    std::vector<Creature*>::const_iterator creatures_it_begin,
+    std::vector<Creature*>::const_iterator creatures_it_end,
+    Animation* animation
+) {
+    const int start_x = center_x - (dungeon_draw_width / 2);
+    const int start_y = center_y - (dungeon_draw_height / 2);
+    const int end_x = center_x + (dungeon_draw_width / 2);
+    const int end_y = center_y + (dungeon_draw_height / 2);
+
+    clear_dungeon();
+
+    draw_dungeon_floor(start_x, start_y, end_x, end_y, dungeon);
+
+    draw_creatures(
+        start_x, start_y, end_x, end_y,
+        creatures_it_begin, creatures_it_end
+    );
+
+    draw_event_messages();
+
+    bool done = false;
+    int delta_x = 0;
+    int delta_y = 0;
+
+    while (!done) {
+        int cur_x = animation->get_start_x() + delta_x;
+        int cur_y = animation->get_start_y() + delta_y;
+
+        if (
+            cur_x == animation->get_end_x() &&
+            cur_y == animation->get_end_y()
+        ) {
+            done = true;
+        }
+
+        if (
+            cur_x - start_x >= dungeon_draw_width ||
+            cur_y - start_y >= dungeon_draw_height ||
+            cur_x - start_x < 0 ||
+            cur_y - start_y < 0
+        ) {}
+        else {
+            al_hold_bitmap_drawing(true);
+
+            al_draw_tinted_bitmap_region(
+                tilemap['/'],
+                al_map_rgba(255, 255, 255, 255),
+                0, 0,
+                tile_width, tile_height,
+                (cur_x - start_x) * tile_width, (cur_y - start_y) * tile_height,
+                0
+            );
+
+            draw_borders();
+
+            al_hold_bitmap_drawing(false);
+
+            al_flip_display();
+
+            usleep(5000);
+        }
+
+        if (cur_x < animation->get_end_x()) {
+            delta_x++;
+        }
+        else if (cur_x > animation->get_end_x()) {
+            delta_x--;
+        }
+        if (cur_y < animation->get_end_y()) {
+            delta_y++;
+        }
+        else if (cur_y > animation->get_end_y()) {
+            delta_y--;
+        }
+    }
+
+    clear_dungeon();
+
+    draw_dungeon_floor(start_x, start_y, end_x, end_y, dungeon);
+
+    draw_creatures(
+        start_x, start_y, end_x, end_y,
+        creatures_it_begin, creatures_it_end
+    );
+
+    draw_event_messages();
+
+    al_flip_display();
+}
+
 void Display::draw_animation(
-    int start_x, int start_y, int end_x, int end_y,
-    const Animation* animation
+    int center_x, int center_y,
+    const Dungeon* dungeon,
+    std::vector<Creature*>::const_iterator creatures_it_begin,
+    std::vector<Creature*>::const_iterator creatures_it_end,
+    Animation* animation
 ) {
     switch (animation->get_animation_type()) {
     case DRAGON_FIRE:
-        break;
+        return;
     case PROJECTILE:
-        break;
+        draw_projectile_animation(
+            center_x, center_y,
+            dungeon,
+            creatures_it_begin,
+            creatures_it_end,
+            animation
+        );
+        return;
     default:
-        break;
+        return;
     }
 }
 
@@ -151,8 +255,7 @@ void Display::draw_dungeon(
     int center_x, int center_y,
     const Dungeon* dungeon,
     std::vector<Creature*>::const_iterator creatures_it_begin,
-    std::vector<Creature*>::const_iterator creatures_it_end,
-    std::vector<Animation*> animations
+    std::vector<Creature*>::const_iterator creatures_it_end
 ) {
     // Defer actually "rendering" any drawing we do until this is disabled.
     // Gives a significant performance boost.
@@ -170,22 +273,6 @@ void Display::draw_dungeon(
         creatures_it_begin, creatures_it_end
     );
 
-    for (auto it = animations.cbegin(); it != animations.cend(); it++) {
-        draw_animation(start_x, start_y, end_x, end_y, *it);
-
-        clear_dungeon();
-
-        // Draw the buffer we've been building to the user-visible display
-        al_flip_display();
-
-        draw_dungeon_floor(start_x, start_y, end_x, end_y, dungeon);
-
-        draw_creatures(
-            start_x, start_y, end_x, end_y,
-            creatures_it_begin, creatures_it_end
-        );
-    }
-
     // Re-enable drawing, so that all the work we did above can be batched.
     // We've essentially queued up a bunch of drawing work, to be done all at
     // once.
@@ -199,7 +286,7 @@ void Display::clear_dungeon()
         0, 0,
         tile_width, tile_height,
         0, 0,
-        dungeon_draw_width * tile_width, dungeon_draw_height * tile_height,
+        dungeon_draw_width * tile_width - 1, dungeon_draw_height * tile_height - 1,
         0
     );
 }
