@@ -21,6 +21,8 @@ public:
     Display();
     ~Display();
 
+    void add_event_message(std::string msg);
+
     void draw_animation(
         int center_x, int center_y,
         const Dungeon* dungeon,
@@ -36,7 +38,7 @@ public:
         std::vector<Creature*>::const_iterator creatures_it_end
     );
     void draw_borders();
-    void draw_event_messages(std::vector<std::string> messages);
+    void draw_event_messages();
     void draw_game_over();
     void update_screen();
 
@@ -62,6 +64,8 @@ private:
 
     uint64_t disp_tile_width;
     uint64_t disp_tile_height;
+
+    std::vector<std::string> event_messages;
 
     void init() throw (std::runtime_error);
     void init_tilemap();

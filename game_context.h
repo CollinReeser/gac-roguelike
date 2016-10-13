@@ -46,8 +46,6 @@ private:
     std::vector<Creature*> creatures;
 
     uint64_t clock_time;
-
-    std::vector<std::string> event_messages;
 };
 
 #endif

@@ -306,17 +306,21 @@ void Display::draw_string(int x, int y, std::string str)
     }
 }
 
-void Display::draw_event_messages(std::vector<std::string> messages)
+void Display::add_event_message(std::string msg) {
+    event_messages.push_back(msg);
+}
+
+void Display::draw_event_messages()
 {
     int start_y = dungeon_draw_height + 1;
     int end_y = disp_height / tile_height - 1;
 
     int y = end_y;
-    auto rit = messages.rbegin();
+    auto rit = event_messages.rbegin();
 
     al_hold_bitmap_drawing(true);
 
-    for ( ; y >= start_y && rit != messages.rend(); y--, rit++) {
+    for ( ; y >= start_y && rit != event_messages.rend(); y--, rit++) {
         draw_string(0, y, *rit);
     }
 
@@ -362,9 +366,7 @@ void Display::draw_borders()
         0
     );
 
-
     al_hold_bitmap_drawing(false);
-
 }
 
 void Display::update_screen()

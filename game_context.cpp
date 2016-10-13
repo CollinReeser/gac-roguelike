@@ -116,7 +116,7 @@ void GameContext::conduct_melee_attack(Creature* source, Creature* target) {
         delete target;
     }
 
-    event_messages.push_back(stream.str());
+    display->add_event_message(stream.str());
 }
 
 void GameContext::process_movement(uint64_t x, uint64_t y, Creature* creature) {
@@ -381,7 +381,7 @@ void GameContext::game_loop()
                 dungeon, creatures.cbegin(), creatures.cend()
             );
 
-            display->draw_event_messages(event_messages);
+            display->draw_event_messages();
 
             display->draw_borders();
 
