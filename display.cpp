@@ -146,7 +146,7 @@ void Display::draw_projectile_animation(
     const int end_x = center_x + (dungeon_draw_width / 2);
     const int end_y = center_y + (dungeon_draw_height / 2);
 
-    clear_dungeon();
+    clear_screen();
 
     draw_dungeon_floor(start_x, start_y, end_x, end_y, dungeon);
 
@@ -155,11 +155,33 @@ void Display::draw_projectile_animation(
         creatures_it_begin, creatures_it_end
     );
 
+    draw_borders();
+
     draw_event_messages();
 
     bool done = false;
+    bool drew_animation_element = false;
     int delta_x = 0;
     int delta_y = 0;
+
+    ALLEGRO_EVENT_QUEUE* timer_queue = NULL;
+    ALLEGRO_TIMER* timer = NULL;
+
+    timer = al_create_timer(1.0 / 60);
+    if(!timer) {
+        fprintf(stderr, "failed to create animation timer!\n");
+        return;
+    }
+
+    timer_queue = al_create_event_queue();
+    if(!timer_queue) {
+        fprintf(stderr, "failed to create timer_queue!\n");
+        al_destroy_timer(timer);
+        return;
+    }
+
+    al_register_event_source(timer_queue, al_get_timer_event_source(timer));
+    al_start_timer(timer);
 
     while (!done) {
         int cur_x = animation->get_start_x() + delta_x;
@@ -179,7 +201,12 @@ void Display::draw_projectile_animation(
             cur_y - start_y < 0
         ) {}
         else {
-            al_hold_bitmap_drawing(true);
+            ALLEGRO_EVENT ev;
+            al_wait_for_event(timer_queue, &ev);
+
+            if(ev.type != ALLEGRO_EVENT_TIMER) {
+               continue;
+            }
 
             al_draw_tinted_bitmap_region(
                 tilemap['/'],
@@ -190,13 +217,9 @@ void Display::draw_projectile_animation(
                 0
             );
 
-            draw_borders();
+            drew_animation_element = true;
 
-            al_hold_bitmap_drawing(false);
-
-            al_flip_display();
-
-            usleep(5000);
+            update_screen();
         }
 
         if (cur_x < animation->get_end_x()) {
@@ -213,6 +236,13 @@ void Display::draw_projectile_animation(
         }
     }
 
+    al_destroy_timer(timer);
+    al_destroy_event_queue(timer_queue);
+
+    if (drew_animation_element) {
+        al_rest(0.05);
+    }
+
     clear_dungeon();
 
     draw_dungeon_floor(start_x, start_y, end_x, end_y, dungeon);
@@ -224,7 +254,9 @@ void Display::draw_projectile_animation(
 
     draw_event_messages();
 
-    al_flip_display();
+    draw_borders();
+
+    update_screen();
 }
 
 void Display::draw_animation(
@@ -257,10 +289,6 @@ void Display::draw_dungeon(
     std::vector<Creature*>::const_iterator creatures_it_begin,
     std::vector<Creature*>::const_iterator creatures_it_end
 ) {
-    // Defer actually "rendering" any drawing we do until this is disabled.
-    // Gives a significant performance boost.
-    al_hold_bitmap_drawing(true);
-
     int start_x = center_x - (dungeon_draw_width / 2);
     int start_y = center_y - (dungeon_draw_height / 2);
     int end_x = center_x + (dungeon_draw_width / 2);
@@ -272,11 +300,6 @@ void Display::draw_dungeon(
         start_x, start_y, end_x, end_y,
         creatures_it_begin, creatures_it_end
     );
-
-    // Re-enable drawing, so that all the work we did above can be batched.
-    // We've essentially queued up a bunch of drawing work, to be done all at
-    // once.
-    al_hold_bitmap_drawing(false);
 }
 
 void Display::clear_dungeon()
@@ -318,20 +341,13 @@ void Display::draw_event_messages()
     int y = end_y;
     auto rit = event_messages.rbegin();
 
-    al_hold_bitmap_drawing(true);
-
     for ( ; y >= start_y && rit != event_messages.rend(); y--, rit++) {
         draw_string(0, y, *rit);
     }
-
-    al_hold_bitmap_drawing(false);
 }
 
 void Display::draw_borders()
 {
-    // Try drawing a border
-    al_hold_bitmap_drawing(true);
-
     // Bottom line
     for (int i = 0; i < dungeon_draw_width; i++) {
         al_draw_tinted_bitmap_region(
@@ -365,21 +381,55 @@ void Display::draw_borders()
         dungeon_draw_width * tile_width, dungeon_draw_height * tile_height,
         0
     );
+}
 
-    al_hold_bitmap_drawing(false);
+void Display::draw_basic_screen(
+    int center_x, int center_y,
+    const Dungeon* dungeon,
+    std::vector<Creature*>::const_iterator creatures_it_begin,
+    std::vector<Creature*>::const_iterator creatures_it_end
+) {
+    clear_screen();
+
+    const int start_x = center_x - (dungeon_draw_width / 2);
+    const int start_y = center_y - (dungeon_draw_height / 2);
+    const int end_x = center_x + (dungeon_draw_width / 2);
+    const int end_y = center_y + (dungeon_draw_height / 2);
+
+    draw_dungeon_floor(start_x, start_y, end_x, end_y, dungeon);
+
+    draw_creatures(
+        start_x, start_y, end_x, end_y,
+        creatures_it_begin, creatures_it_end
+    );
+
+    draw_event_messages();
+
+    draw_borders();
+
+    update_screen();
 }
 
 void Display::update_screen()
 {
+    // Enable actual rendering of all the work we did
+    al_hold_bitmap_drawing(false);
+
     // Draw the buffer we've been building to the user-visible display
     al_flip_display();
 
-    // Clear the buffer, to start from scratch on the next draw sequence
+    // Defer actually "rendering" any drawing we do until this is disabled.
+    // Gives a significant performance boost.
+    al_hold_bitmap_drawing(true);
+}
+
+void Display::clear_screen() {
+    // Clear the display buffer completely
     al_clear_to_color(al_map_rgb(0,0,0));
 }
 
 void Display::draw_game_over() {
-    al_clear_to_color(al_map_rgb(0,0,0));
+    clear_screen();
 
     std::string game_over_str("YOU DIED");
 
@@ -389,7 +439,7 @@ void Display::draw_game_over() {
         game_over_str
     );
 
-    al_flip_display();
+    update_screen();
 
     al_rest(3);
 }

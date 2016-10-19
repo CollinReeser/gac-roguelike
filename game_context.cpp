@@ -366,26 +366,22 @@ void GameContext::game_loop()
                 continue;
             }
 
-            display->draw_animation(
-                (*it)->get_x(), (*it)->get_y(),
-                dungeon, creatures.cbegin(), creatures.cend(),
-                new Animation(
-                    AnimationType::PROJECTILE,
-                    &dungeon->entity_at_index(10, 10),
-                    &dungeon->entity_at_index(20, 20)
-                )
-            );
+            if (rand() % 2 == 0) {
+                display->draw_animation(
+                    (*it)->get_x(), (*it)->get_y(),
+                    dungeon, creatures.cbegin(), creatures.cend(),
+                    new Animation(
+                        AnimationType::PROJECTILE,
+                        &dungeon->entity_at_index(10, 10),
+                        &dungeon->entity_at_index(20, 20)
+                    )
+                );
+            }
 
-            display->draw_dungeon(
+            display->draw_basic_screen(
                 (*it)->get_x(), (*it)->get_y(),
                 dungeon, creatures.cbegin(), creatures.cend()
             );
-
-            display->draw_event_messages();
-
-            display->draw_borders();
-
-            display->update_screen();
 
             bool exit_request = take_input(*it);
 

@@ -40,7 +40,16 @@ public:
     void draw_borders();
     void draw_event_messages();
     void draw_game_over();
+
+    void draw_basic_screen(
+        int center_x, int center_y,
+        const Dungeon* dungeon,
+        std::vector<Creature*>::const_iterator creatures_it_begin,
+        std::vector<Creature*>::const_iterator creatures_it_end
+    );
+
     void update_screen();
+    void clear_screen();
 
     ALLEGRO_DISPLAY* display;
 
