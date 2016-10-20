@@ -112,15 +112,13 @@ void GameContext::conduct_throw_attack(Creature* source, Creature* target) {
 
     auto player = get_player();
 
+    auto animation = new Animation(AnimationType::PROJECTILE, source, target);
     display->draw_animation(
         player->get_x(), player->get_y(),
         dungeon, creatures.cbegin(), creatures.cend(),
-        new Animation(
-            AnimationType::PROJECTILE,
-            source,
-            target
-        )
+        animation
     );
+    delete animation;
 
     target->take_damage(damage);
 
@@ -475,6 +473,7 @@ void GameContext::player_died() {
 
 GameContext::~GameContext()
 {
+    delete config;
     delete display;
     delete dungeon;
 

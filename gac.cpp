@@ -10,7 +10,10 @@ int main(int argc, char** argv)
     srand(time(NULL));
 
     GameContext* game_context = new GameContext();
+
     game_context->game_loop();
+
+    delete game_context;
 
     return 0;
 }

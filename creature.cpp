@@ -116,6 +116,8 @@ void Creature::take_damage(uint64_t damage) {
     health -= damage;
 }
 
-Creature::~Creature()
-{
+Creature::~Creature() {
+    for (auto it = items.begin(); it != items.end(); it++) {
+        delete it->second;
+    }
 }
