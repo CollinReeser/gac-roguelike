@@ -1,35 +1,40 @@
+#include <string>
+
 #include "item.h"
 
-Item::Item(char symbol, int pos_x, int pos_y):
-    symbol(symbol),
-    pos_x(pos_x),
-    pos_y(pos_y),
+Item::Item(
+    char symbol, std::string name, ALLEGRO_COLOR color,
+    int pos_x, int pos_y,
+    bool can_stack, uint64_t quantity,
+    uint64_t throw_priority, uint64_t weight
+):
+    Entity(symbol, name, color, true, pos_x, pos_y),
+    can_stack(can_stack),
+    quantity(quantity),
+    throw_priority(throw_priority),
+    weight(weight)
 {
 }
 
-char Item::get_symbol() const
-{
-    return symbol;
+uint64_t Item::get_throw_priority() const {
+    return throw_priority;
 }
 
-int Item::get_x() const
-{
-    return pos_x;
+uint64_t Item::get_quantity() const {
+    return quantity;
 }
 
-int Item::get_y() const
-{
-    return pos_y;
+void Item::set_quantity(uint64_t quantity) {
+    this->quantity = quantity;
 }
 
-void Item::set_x(int x)
-{
-    pos_x = x;
-}
-
-void Item::set_y(int y)
-{
-    pos_y = y;
+Item* Item::copy(uint64_t quantity) const {
+    return new Item(
+        get_symbol(), get_name(), get_color(),
+        get_x(), get_y(),
+        can_stack, quantity,
+        throw_priority, weight
+    );
 }
 
 Item::~Item()

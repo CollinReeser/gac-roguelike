@@ -26,6 +26,7 @@ private:
 
     void process_movement(uint64_t x, uint64_t y, Creature* creature);
     void conduct_melee_attack(Creature* source, Creature* target);
+    void conduct_throw_attack(Creature* source, Creature* target);
     void ai_turn(Creature* player, Creature* creature);
     bool creature_nearby(Creature* creat_a, Creature* creat_b, uint64_t thresh);
     void move_towards(Creature* creat_a, Creature* creat_b);
@@ -34,6 +35,8 @@ private:
     Creature* creature_at_index(uint64_t x, uint64_t y);
     void kill_creature_at_index(uint64_t x, uint64_t y);
     bool index_is_unoccupied(uint64_t x, uint64_t y);
+
+    std::string damage_flavor(Creature* source, Creature* target);
 
     void player_died();
 

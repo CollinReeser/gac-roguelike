@@ -15,11 +15,14 @@ public:
 
     void dump();
 
-    Creature* load_creature(std::string name);
-    Creature* load_random_creature();
+    Creature* load_creature(std::string name) const;
+    Creature* load_random_creature() const;
+
+    Item* load_item(std::string name, uint64_t quantity = 1) const;
 
 private:
     nlohmann::json creature_config;
+    nlohmann::json item_config;
 
 };
 

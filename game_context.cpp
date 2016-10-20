@@ -1,8 +1,9 @@
 #include <allegro5/allegro.h>
 
 #include <sstream>
-#include <vector>
+#include <unordered_map>
 #include <utility>
+#include <vector>
 
 #include "animation.h"
 #include "config.h"
@@ -39,11 +40,18 @@ GameContext::GameContext():
         }
     }
 
-    creatures.push_back(
-        new Creature(
-            '@', "Glorzak", true, true, true, free_pos_x, free_pos_y, 50, 100
-        )
+    auto player = new Creature(
+        '@', "Glorzak", al_map_rgb(255, 255, 255),
+        true, true, true,
+        50, 100,
+        1, 1,
+        true,
+        {}
     );
+
+    player->set_position(free_pos_x, free_pos_y);
+
+    creatures.push_back(player);
 }
 
 Creature* GameContext::creature_at_index(uint64_t x, uint64_t y)
@@ -90,6 +98,65 @@ void GameContext::conduct_melee_attack(Creature* source, Creature* target) {
         stream << "with its fists. ";
     }
 
+    stream << damage_flavor(source, target);
+    display->add_event_message(stream.str());
+
+    if (target->get_health() <= 0) {
+        kill_creature_at_index(target->get_x(), target->get_y());
+        delete target;
+    }
+}
+
+void GameContext::conduct_throw_attack(Creature* source, Creature* target) {
+    auto damage = source->get_dexterity();
+
+    auto player = get_player();
+
+    display->draw_animation(
+        player->get_x(), player->get_y(),
+        dungeon, creatures.cbegin(), creatures.cend(),
+        new Animation(
+            AnimationType::PROJECTILE,
+            source,
+            target
+        )
+    );
+
+    target->take_damage(damage);
+
+    auto thrown_item = source->consume_throwable();
+
+    std::ostringstream stream;
+
+    if (source->is_player()) {
+        stream << "You throw a " << thrown_item->get_name()
+               << " at the " << target->get_name() << ". ";
+    }
+    else {
+        stream << "The " << source->get_name()
+               << " throws a " << thrown_item->get_name() << " at ";
+        if (target->is_player()) {
+            stream << "you";
+        }
+        else {
+            stream << "the " << target->get_name();
+        }
+        stream << ". ";
+    }
+
+    delete thrown_item;
+
+    stream << damage_flavor(source, target);
+    display->add_event_message(stream.str());
+
+    if (target->get_health() <= 0) {
+        kill_creature_at_index(target->get_x(), target->get_y());
+        delete target;
+    }
+}
+
+std::string GameContext::damage_flavor(Creature* source, Creature* target) {
+    std::ostringstream stream;
 
     if (!target->is_player()) {
         stream << "The " << target->get_name();
@@ -111,12 +178,7 @@ void GameContext::conduct_melee_attack(Creature* source, Creature* target) {
         }
     }
 
-    if (target->get_health() <= 0) {
-        kill_creature_at_index(target->get_x(), target->get_y());
-        delete target;
-    }
-
-    display->add_event_message(stream.str());
+    return stream.str();
 }
 
 void GameContext::process_movement(uint64_t x, uint64_t y, Creature* creature) {
@@ -234,7 +296,10 @@ void GameContext::ai_turn(Creature* player, Creature* creature) {
 
     //check to see if player is nearby
     if (creature_nearby(creature, player, 5)) {
-        if (creature_nearby(creature, player, 1)) {
+        if (creature->get_can_throw() && creature->has_throwable()) {
+            conduct_throw_attack(creature, player);
+        }
+        else if (creature_nearby(creature, player, 1)) {
             conduct_melee_attack(creature, player);
         }
         else {
@@ -364,18 +429,6 @@ void GameContext::game_loop()
             {
                 ai_turn(player, *it);
                 continue;
-            }
-
-            if (rand() % 2 == 0) {
-                display->draw_animation(
-                    (*it)->get_x(), (*it)->get_y(),
-                    dungeon, creatures.cbegin(), creatures.cend(),
-                    new Animation(
-                        AnimationType::PROJECTILE,
-                        &dungeon->entity_at_index(10, 10),
-                        &dungeon->entity_at_index(20, 20)
-                    )
-                );
             }
 
             display->draw_basic_screen(
