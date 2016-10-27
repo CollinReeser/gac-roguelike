@@ -364,16 +364,12 @@ void GameContext::wander(Creature* creature) {
 
     std::vector<std::pair<int,int>> spaces;
 
-    int x = -1;
-    while (x < 2) {
-        int y = -1;
-        while (y < 2) {
+    for (int x = -1; x < 2; x++) {
+        for (int y = -1; y < 2; y++) {
             if (index_is_unoccupied(creature->get_x() + x, creature->get_y() + y)) {
                 spaces.push_back(std::make_pair(creature->get_x() + x, creature->get_y() + y));
             }
-            y++;
         }
-        x++;
     }
 
     if (!spaces.empty()) {
@@ -387,15 +383,11 @@ path_node* GameContext::find_path(uint64_t x_start, uint64_t y_start, uint64_t x
     path_node* start_node = new path_node({x_start, y_start, 0, 0, NULL});
     path_node* finish_node = new path_node({x_finish, y_finish, 0, 0, NULL});
 
-    printf("START NODE: %d, %d, score %d\n", start_node->x_coord, start_node->y_coord, start_node->score_start, start_node->score_end);
-    printf("FINISH NODE: %d, %d, score %d\n", finish_node->x_coord, finish_node->y_coord, finish_node->score_start, finish_node->score_end);
-
     bool** explored = new bool*[dungeon->get_height()];
 
     for (int i = 0; i < dungeon->get_height(); i++) {
-        explored[i] = new bool[dungeon->get_width()];    
+        explored[i] = new bool[dungeon->get_width()]();
     }
-    
 
     std::list<path_node*> finished;
 
@@ -411,7 +403,6 @@ path_node* GameContext::find_path(uint64_t x_start, uint64_t y_start, uint64_t x
 
         if (candidates.size() == 0) {
             // ran out of candidates (no path)
-            printf("No candidates!\n");
             return start_node;
         }
 
@@ -419,26 +410,21 @@ path_node* GameContext::find_path(uint64_t x_start, uint64_t y_start, uint64_t x
         candidates.pop_front();
 
         if (candidate_is_end_node(candidate, finish_node)) {
-            printf("Done.\n");
             break;
         }
 
         finished.push_back(candidate);
 
-        printf("Got from front of candidates: %d, %d, score %d:%d\n", candidate->x_coord, candidate->y_coord, candidate->score_start, candidate->score_end);
-
         std::list<path_node*> adj = get_adjacent_nodes(candidate, start_node, finish_node, explored);
 
         if (adj.size() > 0) {
-            printf("Got %d adjacent nodes\n", adj.size());
-
             for (auto it_adj = adj.begin(); it_adj != adj.end(); it_adj++){
                 if (candidates.empty()) {
                     candidates.push_back((*it_adj));
                 }
                 else {
                     bool inserted = false;
-                    for (auto it = candidates.begin(); it != candidates.end(); it++) {            
+                    for (auto it = candidates.begin(); it != candidates.end(); it++) {
                         if ((*it_adj)->score_start + (*it_adj)->score_end < (*it)->score_start + (*it)->score_end){
                             candidates.insert(it, (*it_adj));
                             inserted = true;
@@ -450,18 +436,7 @@ path_node* GameContext::find_path(uint64_t x_start, uint64_t y_start, uint64_t x
                     }
                 }
             }
-
-
         }
-
-        if (candidates.size() > 0) 
-            printf("Front of candidates list: %d, %d, score %d:%d\n", candidates.front()->x_coord, candidates.front()->y_coord, candidates.front()->score_start, candidates.front()->score_end);
-
-        printf("SCORES: ");
-        for (auto it = candidates.begin(); it != candidates.end(); it++) {
-            printf("%d:%d, ", (*it)->score_start, (*it)->score_end);
-        }
-        printf("\n");
     }
 
     // found end node, loop through previous node
@@ -472,7 +447,6 @@ path_node* GameContext::find_path(uint64_t x_start, uint64_t y_start, uint64_t x
     }
 
     //found next node. return it.
-    printf("Got candidate!\n\n\n");
     return candidate;
 
 }
@@ -481,91 +455,55 @@ bool GameContext::candidate_is_end_node(path_node* node, path_node* finish_node)
     return (node->x_coord == finish_node->x_coord && node->y_coord == finish_node->y_coord);
 }
 
-void GameContext::score_node(path_node* node, path_node* start, path_node* goal, uint64_t D) {
-    node->score_end = std::max(std::abs((int)node->x_coord - (int)goal->x_coord), std::abs((int)node->y_coord - (int)goal->y_coord));
-}
-
-
 std::list<path_node*> GameContext::get_adjacent_nodes(path_node* node, path_node* start, path_node* finish, bool** explored) {
-
-    printf("Entered adj_nodes()\n");
-
     std::list<path_node*> adj_nodes;
 
-    int x = -1;
-    while (x < 2) {
-        int y = -1;
-        while (y < 2) {
+    for (int x = -1; x < 2; x++) {
+        for (int y = -1; y < 2; y++) {
             if (x == 0 && y == 0) {
-                y++;
                 continue;
             }
 
             uint64_t new_x = node->x_coord + x;
             uint64_t new_y = node->y_coord + y;
 
-            printf("Checking %d, %d...\n", new_x, new_y);
-
             if (
-                (index_is_unoccupied(new_x, new_y) && 
-                valid_index(new_x, new_y) &&
-                !explored[new_y][new_x])
+                (
+                    new_x == finish->x_coord && new_y == finish->y_coord
+                ) ||
+                (
+                    index_is_unoccupied(new_x, new_y) &&
+                    valid_index(new_x, new_y) &&
+                    !explored[new_y][new_x]
+                )
             ) {
 
                 //create new node using new coords and set previous node to "start" node
                 path_node* new_node = new path_node({new_x, new_y, 0, 0, node});
 
-                score_node(new_node, start, finish, 1);
                 new_node->score_start = node->score_start + 1;
+                new_node->score_end = std::max(
+                    std::abs((int)new_node->x_coord - (int)finish->x_coord),
+                    std::abs((int)new_node->y_coord - (int)finish->y_coord)
+                );
 
-                printf("Valid node at %d, %d, with score of %d:%d\n", new_x, new_y, new_node->score_start, new_node->score_end);
-
-                // if (adj_nodes.empty()) {
-                    adj_nodes.push_back(new_node);
-                // }
-                // else {
-                //     auto it = adj_nodes.begin();
-                //     while (it != adj_nodes.end()) {
-                //         if (new_node->score < (*it)->score){
-                //             adj_nodes.insert(it, new_node);
-                //             break;
-                //         }
-                //         else {
-                //             it++;
-                //         }
-                //     }
-                // }
-            }
-            else if (new_x == finish->x_coord && new_y == finish->y_coord) {
-                path_node* new_node = new path_node({new_x, new_y, 0, 0, node});
-                score_node(new_node, start, finish, 1);
-                new_node->score_start = node->score_start + 1;
                 adj_nodes.push_back(new_node);
-                printf("Added finish node at %d, %d, with score of %d:%d\n", new_node->x_coord, new_node->y_coord, new_node->score_start, new_node->score_end);
             }
 
             // whether we added it to adj_nodes or not, we explored the node.
             if (valid_index(new_x, new_y)) {
                 explored[new_y][new_x] = true;
             }
-            y++;
         }
-        x++;
     }
 
-    printf("Leaving adj_nodes()\n");
-
     return adj_nodes;
-
 }
 
 bool GameContext::valid_index(uint64_t x, uint64_t y) {
     if (x >= dungeon->get_width() || y >= dungeon->get_height()) {
         return false;
     }
-    // else if (x < 0 || y < 0) {
-    //     return false;
-    // }
     else {
         return true;
     }
@@ -607,7 +545,6 @@ void GameContext::game_loop()
 
             if (!(*it)->is_controllable())
             {
-                printf("AI's Turn...\n");
                 ai_turn(player, *it);
                 continue;
             }
