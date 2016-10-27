@@ -113,7 +113,26 @@ Item* Creature::consume_throwable() {
 }
 
 void Creature::take_damage(uint64_t damage) {
-    health -= damage;
+    if (damage > health) {
+        health = 0;
+    }
+    else {
+        health -= damage;
+    }
+}
+
+void Creature::increment_poison_counter() {
+    poison_counter++;
+}
+
+void Creature::decrement_poison_counter() {
+    if (poison_counter > 0) {
+        poison_counter--;
+    }
+}
+
+uint64_t Creature::get_poison_counter() {
+    return poison_counter;
 }
 
 Creature::~Creature() {

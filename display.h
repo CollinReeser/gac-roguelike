@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <stdexcept>
 #include <stdint.h>
+#include <list>
 #include <string>
 #include <vector>
 
@@ -18,24 +19,24 @@
 class Display
 {
 public:
+    static void add_event_message(std::string msg);
+
     Display();
     ~Display();
-
-    void add_event_message(std::string msg);
 
     void draw_animation(
         int center_x, int center_y,
         const Dungeon* dungeon,
-        std::vector<Creature*>::const_iterator creatures_it_begin,
-        std::vector<Creature*>::const_iterator creatures_it_end,
+        std::list<Creature*>::const_iterator creatures_it_begin,
+        std::list<Creature*>::const_iterator creatures_it_end,
         Animation* animation
     );
 
     void draw_dungeon(
         int center_x, int center_y,
         const Dungeon* dungeon,
-        std::vector<Creature*>::const_iterator creatures_it_begin,
-        std::vector<Creature*>::const_iterator creatures_it_end
+        std::list<Creature*>::const_iterator creatures_it_begin,
+        std::list<Creature*>::const_iterator creatures_it_end
     );
     void draw_borders();
     void draw_event_messages();
@@ -44,8 +45,8 @@ public:
     void draw_basic_screen(
         int center_x, int center_y,
         const Dungeon* dungeon,
-        std::vector<Creature*>::const_iterator creatures_it_begin,
-        std::vector<Creature*>::const_iterator creatures_it_end
+        std::list<Creature*>::const_iterator creatures_it_begin,
+        std::list<Creature*>::const_iterator creatures_it_end
     );
 
     void update_screen();
@@ -54,6 +55,8 @@ public:
     ALLEGRO_DISPLAY* display;
 
 private:
+    static std::vector<std::string> event_messages;
+
     ALLEGRO_BITMAP* tileset;
 
     std::unordered_map<char, ALLEGRO_BITMAP*> tilemap;
@@ -74,8 +77,6 @@ private:
     uint64_t disp_tile_width;
     uint64_t disp_tile_height;
 
-    std::vector<std::string> event_messages;
-
     void init() throw (std::runtime_error);
     void init_tilemap();
 
@@ -85,8 +86,8 @@ private:
 
     void draw_creatures(
         int start_x, int start_y, int end_x, int end_y,
-        std::vector<Creature*>::const_iterator creatures_it_begin,
-        std::vector<Creature*>::const_iterator creatures_it_end
+        std::list<Creature*>::const_iterator creatures_it_begin,
+        std::list<Creature*>::const_iterator creatures_it_end
     );
 
     void draw_dungeon_floor(
@@ -97,8 +98,8 @@ private:
     void draw_projectile_animation(
         int center_x, int center_y,
         const Dungeon* dungeon,
-        std::vector<Creature*>::const_iterator creatures_it_begin,
-        std::vector<Creature*>::const_iterator creatures_it_end,
+        std::list<Creature*>::const_iterator creatures_it_begin,
+        std::list<Creature*>::const_iterator creatures_it_end,
         Animation* animation
     );
 };

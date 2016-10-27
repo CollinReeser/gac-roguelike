@@ -1,6 +1,7 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
 
+#include <list>
 #include <map>
 #include <stdexcept>
 #include <stdio.h>
@@ -14,6 +15,13 @@
 #include "creature.h"
 #include "display.h"
 #include "dungeon.h"
+#include "game_context.h"
+
+std::vector<std::string> Display::event_messages;
+
+void Display::add_event_message(std::string msg) {
+    Display::event_messages.push_back(msg);
+}
 
 Display::Display():
     display(NULL),
@@ -76,8 +84,8 @@ void Display::init_tilemap()
 
 void Display::draw_creatures(
     int start_x, int start_y, int end_x, int end_y,
-    std::vector<Creature*>::const_iterator creatures_it_begin,
-    std::vector<Creature*>::const_iterator creatures_it_end
+    std::list<Creature*>::const_iterator creatures_it_begin,
+    std::list<Creature*>::const_iterator creatures_it_end
 ) {
     // If a given entity shows up within the dungeon display window, draw it
     for (; creatures_it_begin != creatures_it_end; ++creatures_it_begin)
@@ -137,8 +145,8 @@ void Display::draw_dungeon_floor(
 void Display::draw_projectile_animation(
     int center_x, int center_y,
     const Dungeon* dungeon,
-    std::vector<Creature*>::const_iterator creatures_it_begin,
-    std::vector<Creature*>::const_iterator creatures_it_end,
+    std::list<Creature*>::const_iterator creatures_it_begin,
+    std::list<Creature*>::const_iterator creatures_it_end,
     Animation* animation
 ) {
     const int start_x = center_x - (dungeon_draw_width / 2);
@@ -262,8 +270,8 @@ void Display::draw_projectile_animation(
 void Display::draw_animation(
     int center_x, int center_y,
     const Dungeon* dungeon,
-    std::vector<Creature*>::const_iterator creatures_it_begin,
-    std::vector<Creature*>::const_iterator creatures_it_end,
+    std::list<Creature*>::const_iterator creatures_it_begin,
+    std::list<Creature*>::const_iterator creatures_it_end,
     Animation* animation
 ) {
     switch (animation->get_animation_type()) {
@@ -286,8 +294,8 @@ void Display::draw_animation(
 void Display::draw_dungeon(
     int center_x, int center_y,
     const Dungeon* dungeon,
-    std::vector<Creature*>::const_iterator creatures_it_begin,
-    std::vector<Creature*>::const_iterator creatures_it_end
+    std::list<Creature*>::const_iterator creatures_it_begin,
+    std::list<Creature*>::const_iterator creatures_it_end
 ) {
     int start_x = center_x - (dungeon_draw_width / 2);
     int start_y = center_y - (dungeon_draw_height / 2);
@@ -329,19 +337,18 @@ void Display::draw_string(int x, int y, std::string str)
     }
 }
 
-void Display::add_event_message(std::string msg) {
-    event_messages.push_back(msg);
-}
-
-void Display::draw_event_messages()
-{
+void Display::draw_event_messages() {
     int start_y = dungeon_draw_height + 1;
     int end_y = disp_height / tile_height - 1;
 
     int y = end_y;
-    auto rit = event_messages.rbegin();
+    auto rit = Display::event_messages.rbegin();
 
-    for ( ; y >= start_y && rit != event_messages.rend(); y--, rit++) {
+    for (
+        ;
+        y >= start_y && rit != Display::event_messages.rend();
+        y--, rit++
+    ) {
         draw_string(0, y, *rit);
     }
 }
@@ -386,8 +393,8 @@ void Display::draw_borders()
 void Display::draw_basic_screen(
     int center_x, int center_y,
     const Dungeon* dungeon,
-    std::vector<Creature*>::const_iterator creatures_it_begin,
-    std::vector<Creature*>::const_iterator creatures_it_end
+    std::list<Creature*>::const_iterator creatures_it_begin,
+    std::list<Creature*>::const_iterator creatures_it_end
 ) {
     clear_screen();
 

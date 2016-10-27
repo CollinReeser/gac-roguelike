@@ -45,6 +45,10 @@ public:
 
     void take_damage(uint64_t damage);
 
+    void increment_poison_counter();
+    void decrement_poison_counter();
+    uint64_t get_poison_counter();
+
 private:
     std::string name;
 
@@ -63,6 +67,8 @@ private:
     bool can_throw;
 
     std::unordered_map<char, Item*> items;
+
+    uint64_t poison_counter = 0;
 };
 
 #endif

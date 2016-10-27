@@ -4,13 +4,14 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
 
+#include <list>
 #include <stdint.h>
-#include <vector>
 
 #include "config.h"
 #include "creature.h"
 #include "display.h"
 #include "dungeon.h"
+#include "event.h"
 
 class GameContext
 {
@@ -46,7 +47,8 @@ private:
 
     ALLEGRO_EVENT_QUEUE* queue;
 
-    std::vector<Creature*> creatures;
+    std::list<Creature*> creatures;
+    std::list<Event*> events;
 
     uint64_t clock_time;
 };
