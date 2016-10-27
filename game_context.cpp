@@ -46,6 +46,7 @@ GameContext::GameContext():
         50, 100,
         1, 1,
         true,
+        {},
         {}
     );
 
@@ -92,14 +93,15 @@ void GameContext::conduct_melee_attack(Creature* source, Creature* target) {
         stream << "You hit the " << target->get_name() << " with your fists. ";
     }
     else {
-        stream << "The " << source->get_name() << " hits ";
+        stream << "The " << source->get_name() << " ";
+        stream << source->get_attack_flavor() << " ";
         if (target->is_player()) {
             stream << "you ";
         }
         else {
             stream << "the " << target->get_name() << " ";
         }
-        stream << "with its fists. ";
+        stream << "with its " << source->get_weapon_name() << ". ";
     }
 
     stream << damage_flavor(source, target);
@@ -107,6 +109,10 @@ void GameContext::conduct_melee_attack(Creature* source, Creature* target) {
 
     if (target->get_health() <= 0) {
         kill_creature_at_index(target->get_x(), target->get_y());
+    }
+
+    for (auto event : source->generate_on_melee_attack_events(target)) {
+        events.push_back(event);
     }
 }
 
@@ -397,11 +403,6 @@ void GameContext::wander(Creature* creature) {
 
 void GameContext::game_loop()
 {
-    auto poison_player_event = new Event(100, 500);
-    poison_player_event->add_poison_effect(get_player(), 1);
-
-    events.push_back(poison_player_event);
-
     while (1)
     {
         if (clock_time % 100 == 0) {
@@ -421,6 +422,7 @@ void GameContext::game_loop()
             while (it != events.end()) {
                 if ((*it)->is_turn(clock_time)) {
                     if ((*it)->apply_event()) {
+                        delete *it;
                         it = events.erase(it);
 
                         continue;

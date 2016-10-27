@@ -1,6 +1,8 @@
 #ifndef CREATURE_H
 #define CREATURE_H
 
+class Creature;
+
 #include <allegro5/allegro.h>
 
 #include <stdint.h>
@@ -8,8 +10,11 @@
 #include <unordered_map>
 #include <vector>
 
+#include "ability.h"
 #include "entity.h"
+#include "event.h"
 #include "item.h"
+#include "weapon.h"
 
 class Creature : public Entity
 {
@@ -20,7 +25,8 @@ public:
         uint64_t speed, uint64_t max_health,
         uint64_t strength, uint64_t dexterity,
         bool can_throw,
-        std::unordered_map<char, Item*> items
+        std::unordered_map<char, Item*> items,
+        std::vector<Ability*> on_melee_attack_abilities
     );
     ~Creature();
 
@@ -49,6 +55,14 @@ public:
     void decrement_poison_counter();
     uint64_t get_poison_counter();
 
+    std::string get_weapon_name() const;
+    std::string get_attack_flavor() const;
+
+    void set_unarmed_attack_weapon(std::string unarmed_attack_weapon);
+    void set_unarmed_attack_flavor(std::string unarmed_attack_flavor);
+
+    std::vector<Event*> generate_on_melee_attack_events(Creature* target);
+
 private:
     std::string name;
 
@@ -68,7 +82,13 @@ private:
 
     std::unordered_map<char, Item*> items;
 
+    std::string unarmed_attack_weapon = "";
+    std::string unarmed_attack_flavor = "";
+    Weapon* equipped_weapon = NULL;
+
     uint64_t poison_counter = 0;
+
+    std::vector<Ability*> on_melee_attack_abilities;
 };
 
 #endif
