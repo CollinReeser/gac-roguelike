@@ -10,10 +10,9 @@
 
 #include "json/src/json.hpp"
 
+#include "ability.h"
 #include "creature.h"
 #include "item.h"
-
-using json = nlohmann::json;
 
 Config::Config() {
     std::ifstream creature_in("creature.cfg", std::ifstream::in);
@@ -21,14 +20,14 @@ Config::Config() {
     std::stringstream creature_stream;
     creature_stream << creature_in.rdbuf();
 
-    creature_config = json::parse(creature_stream.str());
+    creature_config = nlohmann::json::parse(creature_stream.str());
 
     std::ifstream item_in("item.cfg", std::ifstream::in);
 
     std::stringstream item_stream;
     item_stream << item_in.rdbuf();
 
-    item_config = json::parse(item_stream.str());
+    item_config = nlohmann::json::parse(item_stream.str());
 }
 
 void Config::dump() {
@@ -36,7 +35,7 @@ void Config::dump() {
 }
 
 Creature* Config::load_creature(std::string name) const {
-    json creature = creature_config[name];
+    nlohmann::json creature = creature_config[name];
 
     std::string symbol_str = creature["symbol"];
     char symbol = symbol_str.at(0);
@@ -81,14 +80,47 @@ Creature* Config::load_creature(std::string name) const {
         }
     }
 
-    return new Creature(
+    std::vector<Ability*> on_melee_attack_abilities;
+    if (creature.find("on_melee_attack") != creature.end()) {
+        auto on_melee_attack = creature["on_melee_attack"];
+
+        for (
+            auto it = on_melee_attack.begin();
+            it != on_melee_attack.end();
+            it++
+        ) {
+            on_melee_attack_abilities.push_back(
+                new Ability(
+                    it.key(), on_melee_attack[it.key()]["chance"],
+                    on_melee_attack[it.key()]["config"]
+                )
+            );
+        }
+    }
+
+    auto creature_obj = new Creature(
         symbol, name, color,
         false, false, false,
         speed, max_health,
         strength, dexterity,
         can_throw,
-        items
+        items,
+        on_melee_attack_abilities
     );
+
+    if (creature.find("unarmed_attack_weapon") != creature.end()) {
+        creature_obj->set_unarmed_attack_weapon(
+            creature["unarmed_attack_weapon"]
+        );
+    }
+
+    if (creature.find("unarmed_attack_flavor") != creature.end()) {
+        creature_obj->set_unarmed_attack_flavor(
+            creature["unarmed_attack_flavor"]
+        );
+    }
+
+    return creature_obj;
 }
 
 Creature* Config::load_random_creature() const {
@@ -105,7 +137,7 @@ Creature* Config::load_random_creature() const {
 }
 
 Item* Config::load_item(std::string name, uint64_t quantity) const {
-    json item = item_config[name];
+    nlohmann::json item = item_config[name];
 
     std::string symbol_str = item["symbol"];
     char symbol = symbol_str.at(0);

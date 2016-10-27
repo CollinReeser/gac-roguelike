@@ -28,6 +28,14 @@ void Item::set_quantity(uint64_t quantity) {
     this->quantity = quantity;
 }
 
+bool Item::get_can_stack() const {
+    return can_stack;
+}
+
+uint64_t Item::get_weight() const {
+    return weight;
+}
+
 Item* Item::copy(uint64_t quantity) const {
     return new Item(
         get_symbol(), get_name(), get_color(),

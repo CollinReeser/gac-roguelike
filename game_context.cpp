@@ -46,6 +46,7 @@ GameContext::GameContext():
         50, 100,
         1, 1,
         true,
+        {},
         {}
     );
 
@@ -67,11 +68,15 @@ Creature* GameContext::creature_at_index(uint64_t x, uint64_t y)
     return NULL;
 }
 
+// Do not call this on the current creature iterator of the main game loop.
+// std::list::erase will keep all iterators valid _except_ for the iterator
+// which is being erased (which makes sense; it's just removing a link in a
+// linked list)
 void GameContext::kill_creature_at_index(uint64_t x, uint64_t y) {
     for (auto it = creatures.begin(); it != creatures.end(); it++) {
         if ((*it)->get_x() == x && (*it)->get_y() == y) {
+            delete *it;
             creatures.erase(it);
-
             break;
         }
     }
@@ -88,22 +93,26 @@ void GameContext::conduct_melee_attack(Creature* source, Creature* target) {
         stream << "You hit the " << target->get_name() << " with your fists. ";
     }
     else {
-        stream << "The " << source->get_name() << " hits ";
+        stream << "The " << source->get_name() << " ";
+        stream << source->get_attack_flavor() << " ";
         if (target->is_player()) {
             stream << "you ";
         }
         else {
             stream << "the " << target->get_name() << " ";
         }
-        stream << "with its fists. ";
+        stream << "with its " << source->get_weapon_name() << ". ";
     }
 
     stream << damage_flavor(source, target);
-    display->add_event_message(stream.str());
+    Display::add_event_message(stream.str());
 
     if (target->get_health() <= 0) {
         kill_creature_at_index(target->get_x(), target->get_y());
-        delete target;
+    }
+
+    for (auto event : source->generate_on_melee_attack_events(target)) {
+        events.push_back(event);
     }
 }
 
@@ -145,11 +154,10 @@ void GameContext::conduct_throw_attack(Creature* source, Creature* target) {
     delete thrown_item;
 
     stream << damage_flavor(source, target);
-    display->add_event_message(stream.str());
+    Display::add_event_message(stream.str());
 
     if (target->get_health() <= 0) {
         kill_creature_at_index(target->get_x(), target->get_y());
-        delete target;
     }
 }
 
@@ -320,7 +328,6 @@ bool GameContext::creature_nearby(
         creat_a->get_y() + thresh >= creat_b->get_y() &&
         creat_a->get_y() - thresh <= creat_b->get_y()
     ) {
-        //printf("NEAR\n");
         return true;
     }
     return false;
@@ -530,35 +537,72 @@ void GameContext::game_loop()
             }
         }
 
-        for (auto it = creatures.begin(); it != creatures.end(); it++)
         {
-            Creature* player;
-            if (!(player = get_player()))
-            {
-                goto PLAYER_DIED;
+            auto it = events.begin();
+            while (it != events.end()) {
+                if ((*it)->is_turn(clock_time)) {
+                    if ((*it)->apply_event()) {
+                        delete *it;
+                        it = events.erase(it);
+
+                        continue;
+                    }
+                }
+
+                it++;
             }
+        }
 
-            if (!(*it)->is_turn(clock_time))
+        {
+            for (auto it = creatures.begin(); it != creatures.end(); it++)
             {
-                continue;
-            }
+                bool creature_died = false;
+                // Check if the creature died from an event
+                if ((*it)->get_health() <= 0) {
+                    delete *it;
+                    // "Kill" the creature
+                    it = creatures.erase(it);
 
-            if (!(*it)->is_controllable())
-            {
-                ai_turn(player, *it);
-                continue;
-            }
+                    // Set up iterator to then be incremented by the for loop
+                    // back to the position we actually want
+                    if (it != creatures.begin()) {
+                        it--;
+                    }
 
-            display->draw_basic_screen(
-                (*it)->get_x(), (*it)->get_y(),
-                dungeon, creatures.cbegin(), creatures.cend()
-            );
+                    creature_died = true;
+                }
 
-            bool exit_request = take_input(*it);
+                Creature* player;
+                if (!(player = get_player())) {
+                    goto PLAYER_DIED;
+                }
 
-            if (exit_request)
-            {
-                goto BREAK_GAME_LOOP;
+                if (creature_died) {
+                    continue;
+                }
+
+                if (!(*it)->is_turn(clock_time))
+                {
+                    continue;
+                }
+
+                if (!(*it)->is_controllable())
+                {
+                    ai_turn(player, *it);
+                    continue;
+                }
+
+                display->draw_basic_screen(
+                    (*it)->get_x(), (*it)->get_y(),
+                    dungeon, creatures.cbegin(), creatures.cend()
+                );
+
+                bool exit_request = take_input(*it);
+
+                if (exit_request)
+                {
+                    goto BREAK_GAME_LOOP;
+                }
             }
         }
 

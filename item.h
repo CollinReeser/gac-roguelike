@@ -25,6 +25,9 @@ public:
     uint64_t get_quantity() const;
     void set_quantity(uint64_t quantity);
 
+    bool get_can_stack() const;
+    uint64_t get_weight() const;
+
     Item* copy(uint64_t quantity = 1) const;
 
 private:
