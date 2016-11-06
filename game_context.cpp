@@ -536,7 +536,7 @@ void GameContext::game_loop()
 {
     while (1)
     {
-        if (clock_time == 5) {
+        if (clock_time % 100 == 0) {
 
             while (1){
 
