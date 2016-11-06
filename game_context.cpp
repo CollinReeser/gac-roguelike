@@ -301,7 +301,7 @@ bool GameContext::take_input(Creature* controllable)
 void GameContext::ai_turn(Creature* player, Creature* creature) {
 
     //check to see if player is nearby
-    if (creature_nearby(creature, player, 5)) {
+    if (creature_nearby(creature, player, 10)) {
         if (creature->get_can_throw() && creature->has_throwable()) {
             conduct_throw_attack(creature, player);
         }
@@ -320,7 +320,7 @@ void GameContext::ai_turn(Creature* player, Creature* creature) {
 
 //Check to see if Creature A is within thresh of Creature B
 bool GameContext::creature_nearby(
-    Creature* creat_a, Creature* creat_b, uint64_t thresh
+    Creature* creat_a, Creature* creat_b, int64_t thresh
 ) {
     if (
         creat_a->get_x() + thresh >= creat_b->get_x() &&
@@ -385,7 +385,7 @@ void GameContext::wander(Creature* creature) {
     }
 }
 
-path_node* GameContext::find_path(uint64_t x_start, uint64_t y_start, uint64_t x_finish, uint64_t y_finish) {
+path_node* GameContext::find_path(int64_t x_start, int64_t y_start, int64_t x_finish, int64_t y_finish) {
 
     path_node* start_node = new path_node({x_start, y_start, 0, 0, NULL});
     path_node* finish_node = new path_node({x_finish, y_finish, 0, 0, NULL});
@@ -471,8 +471,8 @@ std::list<path_node*> GameContext::get_adjacent_nodes(path_node* node, path_node
                 continue;
             }
 
-            uint64_t new_x = node->x_coord + x;
-            uint64_t new_y = node->y_coord + y;
+            int64_t new_x = node->x_coord + x;
+            int64_t new_y = node->y_coord + y;
 
             if (
                 (
