@@ -59,7 +59,7 @@ private:
 
     ALLEGRO_BITMAP* tileset;
 
-    std::unordered_map<char, ALLEGRO_BITMAP*> tilemap;
+    std::unordered_map<uint8_t, ALLEGRO_BITMAP*> tilemap;
 
     const std::string tileset_filename;
 
