@@ -488,8 +488,23 @@ std::list<path_node*> GameContext::get_adjacent_nodes(path_node* node, path_node
                 //create new node using new coords and set previous node to "start" node
                 path_node* new_node = new path_node({new_x, new_y, 0, 0, node});
 
-                new_node->score_start = node->score_start + 1;
-                new_node->score_end = std::max(
+                if ( // we are inline with target
+                    (node->x_coord == finish->x_coord && new_node->x_coord == finish->x_coord) ||
+                    (node->y_coord == finish->y_coord && new_node->y_coord == finish->y_coord)
+                ) {
+                    new_node->score_start = 10;
+                }
+                else if (
+                    std::min(std::abs(node->x_coord - finish->x_coord), std::abs(node->y_coord - finish->y_coord)) >
+                    std::min(std::abs(new_node->x_coord == finish->x_coord), std::abs(new_node->y_coord == finish->y_coord))
+                ) {
+                    new_node->score_start = 9;
+                }
+                else {
+                    new_node->score_start = 11;
+                }
+
+                new_node->score_end = 10 * std::max(
                     std::abs((int)new_node->x_coord - (int)finish->x_coord),
                     std::abs((int)new_node->y_coord - (int)finish->y_coord)
                 );
