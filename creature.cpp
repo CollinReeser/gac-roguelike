@@ -25,7 +25,7 @@ Creature::Creature(
     std::unordered_map<char, Item*> items,
     std::vector<Ability*> on_melee_attack_abilities
 ):
-    Entity(symbol, name, false, -1, -1),
+    Entity(symbol, name, color, -1, -1, false),
     name(name),
     player(player),
     controllable(controllable),
